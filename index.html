@@ -3,7 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Meta Tags Básicos -->
     <title>Àlex GF | UI/UX & Product Designer</title>
+    <meta name="description" content="Portfolio of Àlex GF, Product & UI/UX Designer specialized in streamlining complex processes and user-centric design.">
+    <meta name="keywords" content="UI Designer, UX Designer, Product Designer, Portfolio, Àlex GF, Barcelona, Web Design, Figma">
+    <meta name="author" content="Àlex GF">
+    
+    <!-- Open Graph / Meta Tags Sociales -->
+    <meta property="og:title" content="Àlex GF | UI/UX & Product Designer">
+    <meta property="og:description" content="Portfolio of Àlex GF, Product & UI/UX Designer specialized in streamlining complex processes and user-centric design.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tu-dominio.com">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630/1E7DE3/FFFFFF?text=%C3%80lex+GF+-+Product+Designer"> 
+
+    <!-- Favicon SVG Integrado -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3e%3crect width='100' height='100' rx='20' fill='%231E7DE3'/%3e%3ctext x='50' y='68' font-size='50' font-family='sans-serif' font-weight='bold' fill='white' text-anchor='middle'%3eÀG%3c/text%3e%3c/svg%3e">
+
+    <!-- Fuentes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,7 +34,8 @@
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
-            --accent-primary: #1E7DE3; /* Color azul personalizado */
+            --accent-primary: #1E7DE3; 
+            --accent-hover: #1565C0;
             --accent-gradient: linear-gradient(135deg, #1E7DE3 0%, #8b5cf6 100%);
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
@@ -34,7 +52,8 @@
             --text-main: #fafafa;
             --text-muted: #a1a1aa;
             --border-color: #27272a;
-            --accent-primary: #3b94f8; /* Ligeramente más brillante en dark mode para accesibilidad */
+            --accent-primary: #3b94f8; 
+            --accent-hover: #60a5fa;
             --accent-gradient: linear-gradient(135deg, #3b94f8 0%, #a78bfa 100%);
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
             --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.3);
@@ -101,7 +120,7 @@
             letter-spacing: -0.5px;
         }
 
-        /* Main Menu Links */
+        /* Main Menu Links & ScrollSpy */
         .nav-links {
             display: flex;
             gap: 1.5rem;
@@ -115,7 +134,7 @@
             position: relative;
         }
 
-        .nav-links a:hover {
+        .nav-links a:hover, .nav-links a.active {
             color: var(--accent-primary);
         }
 
@@ -130,7 +149,7 @@
             transition: width 0.3s ease;
         }
 
-        .nav-links a:hover::after {
+        .nav-links a:hover::after, .nav-links a.active::after {
             width: 100%;
         }
 
@@ -532,8 +551,16 @@
 
         .contact-cta p {
             color: var(--text-muted);
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             font-size: 1.1rem;
+        }
+
+        .contact-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
         }
 
         .email-btn {
@@ -551,8 +578,42 @@
         }
 
         .email-btn:hover {
-            transform: scale(1.05);
+            transform: translateY(-2px);
             box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: var(--accent-primary);
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border-radius: 99px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+            background: var(--accent-hover);
+            color: #ffffff;
+        }
+
+        /* --- LOGICA DE ANIMACIONES SCROLL REVEAL --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.7s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* --- LANGUAGE TOGGLE LOGIC --- */
@@ -576,28 +637,28 @@
             <div class="logo">Àlex GF</div>
             
             <div class="nav-links">
-                <a href="#about">
+                <a href="#about" aria-label="Go to About Section">
                     <span lang="es">Sobre mí</span><span lang="en">About</span>
                 </a>
-                <a href="#experience">
+                <a href="#experience" aria-label="Go to Experience Section">
                     <span lang="es">Experiencia</span><span lang="en">Experience</span>
                 </a>
-                <a href="#skills">
+                <a href="#skills" aria-label="Go to Skills Section">
                     <span lang="es">Habilidades</span><span lang="en">Skills</span>
                 </a>
-                <a href="#education">
+                <a href="#education" aria-label="Go to Education Section">
                     <span lang="es">Formación</span><span lang="en">Education</span>
                 </a>
-                <a href="#contact">
+                <a href="#contact" aria-label="Go to Contact Section">
                     <span lang="es">Contacto</span><span lang="en">Contact</span>
                 </a>
             </div>
 
             <div class="controls">
-                <button class="ui-btn" onclick="toggleTheme()" id="themeBtn">
-                    <span id="themeIcon">🌙</span>
+                <button class="ui-btn" onclick="toggleTheme()" id="themeBtn" aria-label="Toggle Dark/Light Theme">
+                    <span id="themeIcon" aria-hidden="true">🌙</span>
                 </button>
-                <button class="ui-btn" onclick="toggleLang()" id="langBtn">
+                <button class="ui-btn" onclick="toggleLang()" id="langBtn" aria-label="Cambiar idioma / Change language">
                     🌐 ES
                 </button>
             </div>
@@ -619,7 +680,7 @@
         </section>
 
         <!-- About Section -->
-        <section id="about">
+        <section id="about" class="reveal">
             <h2 class="section-title">
                 <span lang="es">Sobre mí</span>
                 <span lang="en">About Me</span>
@@ -643,13 +704,13 @@
 
         <!-- Experience Section -->
         <section id="experience">
-            <h2 class="section-title">
+            <h2 class="section-title reveal">
                 <span lang="es">Experiencia Profesional</span>
                 <span lang="en">Experience</span>
             </h2>
             
             <div class="timeline">
-                <div class="timeline-item">
+                <div class="timeline-item reveal">
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
                         <h3 class="role-title">
@@ -673,7 +734,7 @@
                     </div>
                 </div>
 
-                <div class="timeline-item">
+                <div class="timeline-item reveal">
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
                         <h3 class="role-title">
@@ -695,7 +756,7 @@
                     </div>
                 </div>
 
-                <div class="timeline-item">
+                <div class="timeline-item reveal">
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
                         <h3 class="role-title">
@@ -721,14 +782,14 @@
 
         <!-- Skills Section -->
         <section id="skills">
-            <h2 class="section-title">
+            <h2 class="section-title reveal">
                 <span lang="es">Habilidades</span>
                 <span lang="en">Skills</span>
             </h2>
             
             <div class="skills-grid">
                 <!-- Card 1: UI/UX -->
-                <div class="skill-box">
+                <div class="skill-box reveal">
                     <h3 lang="es">Diseño y Prototipado</h3>
                     <h3 lang="en">Design & Prototyping</h3>
                     <div class="chips-container">
@@ -741,7 +802,7 @@
                 </div>
 
                 <!-- Card 2: Tech -->
-                <div class="skill-box">
+                <div class="skill-box reveal">
                     <h3 lang="es">Herramientas y Web</h3>
                     <h3 lang="en">Tools & Web Dev</h3>
                     <div class="chips-container">
@@ -754,7 +815,7 @@
                 </div>
 
                 <!-- Card 3: Languages -->
-                <div class="skill-box">
+                <div class="skill-box reveal">
                     <h3 lang="es">Idiomas</h3>
                     <h3 lang="en">Languages</h3>
                     <div class="lang-item">
@@ -778,7 +839,7 @@
             </div>
 
             <!-- Soft Skills Full Text Card -->
-            <div class="card">
+            <div class="card reveal">
                 <h3 lang="es" style="margin-bottom: 1rem; color: var(--text-main);">Habilidades Blandas</h3>
                 <h3 lang="en" style="margin-bottom: 1rem; color: var(--text-main);">Soft Skills</h3>
                 
@@ -800,11 +861,11 @@
 
         <!-- Education Section -->
         <section id="education">
-            <h2 class="section-title">
+            <h2 class="section-title reveal">
                 <span lang="es">Formación</span>
                 <span lang="en">Education</span>
             </h2>
-            <div class="card">
+            <div class="card reveal">
                 
                 <!-- Bloque 1: Formación Académica -->
                 <div class="edu-group">
@@ -890,14 +951,28 @@
         </section>
 
         <!-- Contact Section -->
-        <section class="contact-cta" id="contact">
+        <section class="contact-cta reveal" id="contact">
             <h2 lang="es">¿Creamos algo increíble?</h2>
             <h2 lang="en">Let's build something great.</h2>
             <p lang="es">Actualmente buscando nuevas oportunidades como Product Designer.</p>
             <p lang="en">Currently looking for new opportunities as a Product Designer.</p>
             
-            <!-- Email Injected via JS -->
-            <div id="email-container"></div>
+            <div class="contact-buttons">
+                <!-- Email Injected via JS -->
+                <div id="email-container"></div>
+
+                <!-- Enlace al PDF del currículum (Inglés) -->
+                <a href="Alex_Galvan_Resume.pdf" target="_blank" rel="noopener noreferrer" class="btn-primary" lang="en" aria-label="Open or Download Resume in PDF format">
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Download Resume</span>
+                </a>
+
+                <!-- Enlace al PDF del currículum (Castellano) -->
+                <a href="CV_Alex_Galvan.pdf" target="_blank" rel="noopener noreferrer" class="btn-primary" lang="es" aria-label="Abrir o Descargar Curriculum Vitae en formato PDF">
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>Descargar CV</span>
+                </a>
+            </div>
         </section>
 
     </main>
@@ -934,7 +1009,43 @@
             }
         }
 
-        // Protección Anti-Spam
+        // --- SCROLL REVEAL ANIMATIONS ---
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 }); 
+
+        revealElements.forEach(el => revealObserver.observe(el));
+
+
+        // --- SCROLLSPY (Resaltado del menú de navegación) ---
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        window.addEventListener('scroll', () => {
+            let scrollY = window.pageYOffset;
+            
+            sections.forEach(current => {
+                const sectionHeight = current.offsetHeight;
+                const sectionTop = current.offsetTop - 200; 
+                const sectionId = current.getAttribute('id');
+                const navLink = document.querySelector(`.nav-links a[href*=${sectionId}]`);
+                
+                if(navLink) {
+                    if(scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                        navLink.classList.add('active');
+                    } else {
+                        navLink.classList.remove('active');
+                    }
+                }
+            });
+        });
+
+        // Protección Anti-Spam para el Email
         window.onload = function() {
             const user = "alexgfdev";
             const domain = "gmail.com";
@@ -944,8 +1055,9 @@
             const link = document.createElement('a');
             link.href = "mailto:" + email;
             link.className = "email-btn";
+            link.setAttribute("aria-label", "Send an email to Àlex");
             
-            const iconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`;
+            const iconSvg = `<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`;
             
             link.innerHTML = iconSvg + "<span>" + email + "</span>";
             container.appendChild(link);
