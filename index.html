@@ -1,393 +1,953 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Àlex Galván | Portfolio</title>
+    <title>Àlex GF | UI/UX & Product Designer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
+        /* CSS Variables - Design System */
         :root {
-            --bg-color: #ffffff;
-            --text-color: #1a1a1a;
-            --accent-color: #3b82f6;
-            --secondary-text: #4b5563;
-            --border-color: #e5e7eb;
-            --card-bg: #f9fafb;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-nav: rgba(255, 255, 255, 0.85);
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-primary: #1E7DE3; /* Color azul personalizado */
+            --accent-gradient: linear-gradient(135deg, #1E7DE3 0%, #8b5cf6 100%);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            --shadow-hover: 0 10px 25px -5px rgba(30, 125, 227, 0.15), 0 8px 10px -6px rgba(30, 125, 227, 0.1);
+            --chip-bg: #f1f5f9;
+            --chip-text: #334155;
+            --card-hover-border: #93c5fd;
         }
 
-        [data-theme="dark"] {
-            --bg-color: #0f172a;
-            --text-color: #f1f5f9;
-            --accent-color: #60a5fa;
-            --secondary-text: #94a3b8;
-            --border-color: #1e293b;
-            --card-bg: #1e293b;
+        body[data-theme="dark"] {
+            --bg-body: #09090b;
+            --bg-card: #18181b;
+            --bg-nav: rgba(9, 9, 11, 0.85);
+            --text-main: #fafafa;
+            --text-muted: #a1a1aa;
+            --border-color: #27272a;
+            --accent-primary: #3b94f8; /* Ligeramente más brillante en dark mode para accesibilidad */
+            --accent-gradient: linear-gradient(135deg, #3b94f8 0%, #a78bfa 100%);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.3);
+            --shadow-hover: 0 10px 25px -5px rgba(59, 148, 248, 0.2);
+            --chip-bg: #27272a;
+            --chip-text: #e4e4e7;
+            --card-hover-border: #1E7DE3;
         }
 
+        /* Reset & Base Styles */
         * {
             box-sizing: border-box;
-            transition: background-color 0.3s, color 0.3s;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
         }
 
         body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
             line-height: 1.6;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            -webkit-font-smoothing: antialiased;
         }
 
+        a { text-decoration: none; color: inherit; }
+        
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 0 2rem;
         }
 
-        /* Nav & Controls */
+        /* Navigation */
         nav {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            margin-bottom: 3rem;
             position: sticky;
             top: 0;
-            background: var(--bg-color);
-            padding: 1rem 0;
             z-index: 100;
+            background: var(--bg-nav);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            margin-bottom: 3rem;
+            transition: all 0.4s ease;
         }
 
-        button {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: -0.5px;
+        }
+
+        /* Main Menu Links */
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
             font-weight: 600;
+            font-size: 0.9rem;
         }
 
-        button:hover {
-            border-color: var(--accent-color);
+        .nav-links a {
+            color: var(--text-muted);
+            transition: color 0.3s ease;
+            position: relative;
         }
 
-        /* Header */
-        header {
-            margin-bottom: 4rem;
+        .nav-links a:hover {
+            color: var(--accent-primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--accent-primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .controls {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        button.ui-btn {
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.4rem 0.8rem;
+            border-radius: 99px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s ease;
+        }
+
+        button.ui-btn:hover {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Responsive Nav */
+        @media (max-width: 768px) {
+            .nav-content {
+                justify-content: space-between;
+            }
+            .nav-links {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                gap: 1.2rem;
+                font-size: 0.85rem;
+                padding-top: 0.5rem;
+                border-top: 1px solid var(--border-color);
+                flex-wrap: wrap;
+            }
+            .container {
+                padding: 0 1.5rem;
+            }
+        }
+
+        /* Hero Section */
+        .hero {
+            margin-bottom: 2.5rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .greeting {
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.85rem;
         }
 
         h1 {
-            font-size: 2.5rem;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
             margin-bottom: 0.5rem;
-            font-weight: 700;
         }
 
-        .subtitle {
-            font-size: 1.2rem;
-            color: var(--accent-color);
-            font-weight: 400;
+        .gradient-text {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+            font-size: clamp(1.5rem, 3vw, 2.2rem);
+            display: block;
+            margin-top: 0.5rem;
+        }
+
+        /* Generic Section Styling */
+        section {
+            margin-bottom: 4.5rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            height: 1px;
+            flex-grow: 1;
+            background-color: var(--border-color);
+        }
+
+        /* Cards Main */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 1.5rem;
+            }
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
             margin-bottom: 1rem;
         }
 
-        .location {
-            color: var(--secondary-text);
-            font-size: 0.9rem;
+        .card p:last-child { margin-bottom: 0; }
+
+        /* Timeline for Experience */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 3rem;
+        }
+
+        .timeline-item:last-child { margin-bottom: 0; }
+
+        .timeline-dot {
+            position: absolute;
+            left: -2.35rem;
+            top: 0.25rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            border: 3px solid var(--bg-body);
+            box-sizing: content-box;
+        }
+
+        .timeline-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .role-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .company-info {
             display: flex;
+            justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .company-name {
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .date {
+            color: var(--text-muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .tasks {
+            list-style: none;
+            color: var(--text-muted);
+        }
+
+        .tasks li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .tasks li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-primary);
+            font-weight: bold;
+        }
+
+        /* --- SERIOUS SKILLS SECTION --- */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .skill-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .skill-box:hover {
+            border-color: var(--card-hover-border);
+            box-shadow: var(--shadow-md);
+        }
+
+        .skill-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            color: var(--text-main);
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
             gap: 0.5rem;
         }
 
-        /* Sections */
-        section {
-            margin-bottom: 4rem;
+        .chip {
+            background: var(--chip-bg);
+            color: var(--chip-text);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            cursor: default;
         }
 
-        h2 {
-            font-size: 1.5rem;
-            border-bottom: 2px solid var(--accent-color);
-            display: inline-block;
-            margin-bottom: 1.5rem;
-            padding-right: 2rem;
+        .chip:hover {
+            background: var(--text-main);
+            color: var(--bg-body);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
         }
 
-        .experience-item, .education-item {
-            margin-bottom: 2.5rem;
-        }
-
-        .item-header {
+        /* Languages List */
+        .lang-item {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
-            flex-wrap: wrap;
-            margin-bottom: 0.5rem;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.95rem;
         }
-
-        .item-title {
-            font-weight: 700;
-            font-size: 1.1rem;
+        .lang-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
         }
-
-        .item-date {
-            color: var(--secondary-text);
-            font-size: 0.9rem;
-        }
-
-        .item-org {
-            color: var(--accent-color);
-            font-weight: 600;
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        ul {
-            padding-left: 1.2rem;
-            color: var(--secondary-text);
-        }
-
-        li {
-            margin-bottom: 0.5rem;
-        }
-
-        /* Skills Grid */
-        .skills-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
-
-        @media (max-width: 600px) {
-            .skills-container { grid-template-columns: 1fr; }
-            h1 { font-size: 2rem; }
-        }
-
-        .skill-tag {
-            background: var(--card-bg);
+        .lang-level {
+            background: var(--chip-bg);
+            color: var(--text-main);
             padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            display: inline-block;
-            margin: 0.2rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
             border: 1px solid var(--border-color);
         }
 
-        /* Contact / Footer */
-        footer {
-            text-align: center;
-            padding: 4rem 0;
-            border-top: 1px solid var(--border-color);
+        /* Soft Skills List */
+        .soft-skills-list {
+            list-style: none;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
         }
 
-        .email-link {
+        .soft-skills-list li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.8rem;
+            line-height: 1.5;
+        }
+
+        .soft-skills-list li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--accent-primary);
+            font-weight: bold;
             font-size: 1.2rem;
-            color: var(--accent-color);
-            text-decoration: none;
-            font-weight: 600;
+            line-height: 1;
+            top: 0;
         }
 
-        /* Language visibility */
-        [lang="en"], [lang="es"] {
-            display: none;
+        .soft-skills-list strong {
+            color: var(--text-main);
         }
 
-        .lang-en [lang="en"] { display: block; }
-        .lang-es [lang="es"] { display: block; }
+        /* Education Layout */
+        .edu-group {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .edu-group:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .edu-group h3 {
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 800;
+        }
+
+        .edu-item {
+            margin-bottom: 1.5rem;
+        }
         
-        /* Inline display for tags and spans */
-        .lang-en span[lang="en"], .lang-en li[lang="en"] { display: list-item; }
-        .lang-es span[lang="es"], .lang-es li[lang="es"] { display: list-item; }
-        .lang-en span[lang="en"].skill-tag { display: inline-block; }
-        .lang-es span[lang="es"].skill-tag { display: inline-block; }
+        .edu-item:last-child { margin-bottom: 0; }
+
+        .edu-school {
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: 0.3rem;
+            font-size: 1.05rem;
+        }
+
+        .edu-degree {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .edu-degree::before {
+            content: '-';
+            color: var(--text-muted);
+        }
+
+        /* Footer / Contact CTA */
+        .contact-cta {
+            text-align: center;
+            padding: 5rem 0;
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+        }
+
+        .contact-cta h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .contact-cta p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .email-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: var(--text-main);
+            color: var(--bg-body);
+            padding: 1rem 2rem;
+            border-radius: 99px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .email-btn:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* --- LANGUAGE TOGGLE LOGIC --- */
+        body:not(.lang-en) [lang="en"] { display: none !important; }
+        body:not(.lang-es) [lang="es"] { display: none !important; }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
     </style>
 </head>
-<body class="lang-es" data-theme="light">
 
-    <div class="container">
-        <nav>
-            <button onclick="toggleTheme()" id="themeBtn">🌙 Dark Mode</button>
-            <button onclick="toggleLang()" id="langBtn">🇬🇧 English</button>
-        </nav>
+<body class="lang-en" data-theme="light">
 
-        <header>
-            <h1>Àlex Galván</h1>
-            <p class="subtitle">
-                <span lang="es">Interactividad, experiencia de usuario y diseño gráfico</span>
-                <span lang="en">Interactive Design, User Experience (UX) & Graphic Design</span>
-            </p>
-            <p class="location">
-                📍 Barcelona, Spain
-            </p>
-        </header>
+    <!-- Navigation -->
+    <nav>
+        <div class="container nav-content">
+            <div class="logo">Àlex GF</div>
+            
+            <div class="nav-links">
+                <a href="#about">
+                    <span lang="es">Sobre mí</span><span lang="en">About</span>
+                </a>
+                <a href="#experience">
+                    <span lang="es">Experiencia</span><span lang="en">Experience</span>
+                </a>
+                <a href="#skills">
+                    <span lang="es">Habilidades</span><span lang="en">Skills</span>
+                </a>
+                <a href="#education">
+                    <span lang="es">Formación</span><span lang="en">Education</span>
+                </a>
+                <a href="#contact">
+                    <span lang="es">Contacto</span><span lang="en">Contact</span>
+                </a>
+            </div>
 
+            <div class="controls">
+                <button class="ui-btn" onclick="toggleTheme()" id="themeBtn">
+                    <span id="themeIcon">🌙</span>
+                </button>
+                <button class="ui-btn" onclick="toggleLang()" id="langBtn">
+                    🌐 ES
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        
+        <!-- Hero Section -->
+        <section class="hero">
+            <span class="greeting">
+                <span lang="es">Hola, soy</span><span lang="en">Hi, I'm</span>
+            </span>
+            
+            <h1>Àlex GF<br>
+                <span class="gradient-text" lang="es">Product & UI/UX Designer</span>
+                <span class="gradient-text" lang="en">Product & UI/UX Designer</span>
+            </h1>
+        </section>
+
+        <!-- About Section -->
         <section id="about">
-            <h2 lang="es">Acerca de mí</h2>
-            <h2 lang="en">About Me</h2>
-            <p lang="es">
-                Diseñador UI/UX con 6 años de experiencia como formador técnico y creación de contenidos multimedia en entornos académicos. Especializado en la simplificación de procesos complejos y en metodologías de diseño, tutorizando equipos y proyectos multidisciplinares.
-                <br><br>
-                He pasado estos últimos años enseñando y coordinando equipos multidisciplinares, lo que me ha dado una visión muy práctica y realista de cómo las personas interactúan con la tecnología frente a una pantalla.
-            </p>
-            <p lang="en">
-                UI/UX Designer with 6 years of experience in technical training and multimedia content creation within academic environments. Specialized in streamlining complex processes and implementing user-centric design methodologies, while mentoring multidisciplinary teams and projects.
-                <br><br>
-                Having spent the last few years teaching and coordinating diverse workgroups, I have developed a highly practical and realistic understanding of how people actually interact with technology on screen.
-            </p>
+            <h2 class="section-title">
+                <span lang="es">Sobre mí</span>
+                <span lang="en">About Me</span>
+            </h2>
+            <div class="card">
+                <p lang="es">
+                    Diseñador UI/UX de Barcelona con 6 años de experiencia como formador técnico y creador de contenidos multimedia en entornos académicos. Mi especialidad es <strong>simplificar procesos complejos</strong> e implementar metodologías de diseño centradas en el usuario, mientras tutorizo equipos multidisciplinares.
+                </p>
+                <p lang="es">
+                    Haber pasado los últimos años enseñando me ha dado una visión inmensamente práctica y empática de cómo las personas interactúan realmente con la tecnología en pantalla. Para mí, <strong>un diseño exitoso es aquel que elimina la frustración</strong>, reduce la curva de aprendizaje y hace que las herramientas de trabajo diarias sean verdaderamente útiles y accesibles.
+                </p>
+
+                <p lang="en">
+                    UI/UX Designer from Barcelona with 6 years of experience in technical training and multimedia content creation within academic environments. My specialty lies in <strong>streamlining complex processes</strong> and implementing user-centric design methodologies, while mentoring multidisciplinary teams.
+                </p>
+                <p lang="en">
+                    Having spent the last few years teaching has given me an immensely practical and empathetic understanding of how people actually interact with technology on screen. To me, <strong>successful design is one that removes user frustration</strong>, reduces the learning curve, and makes everyday work tools genuinely useful and accessible.
+                </p>
+            </div>
         </section>
 
+        <!-- Experience Section -->
         <section id="experience">
-            <h2 lang="es">Experiencia Profesional</h2>
-            <h2 lang="en">Professional Experience</h2>
-
-            <div class="experience-item">
-                <div class="item-header">
-                    <span class="item-title">
-                        <span lang="es">Docente en UI/UX, diseño gráfico y audiovisuales</span>
-                        <span lang="en">UI/UX, Graphic Design & Audiovisual Educator</span>
-                    </span>
-                    <span class="item-date">2019 — 2025</span>
+            <h2 class="section-title">
+                <span lang="es">Experiencia Profesional</span>
+                <span lang="en">Experience</span>
+            </h2>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3 class="role-title">
+                            <span lang="es">Docente en UI/UX & Diseño Gráfico</span>
+                            <span lang="en">UI/UX & Graphic Design Educator</span>
+                        </h3>
+                        <div class="company-info">
+                            <span class="company-name">Generalitat de Catalunya</span>
+                            <span class="date">2019 — 2025</span>
+                        </div>
+                        <ul class="tasks" lang="es">
+                            <li>Docencia avanzada en diseño de interfaces (UI/UX), prototipado de alta fidelidad, sistemas de diseño y desarrollo web.</li>
+                            <li><strong>Gestión de proyectos (ESDAPC):</strong> Tutorización y mentoría de proyectos complejos de UX para alumnos de grado superior.</li>
+                            <li><strong>Adopción Tecnológica:</strong> Facilitador de la curva de aprendizaje de herramientas digitales, traduciendo conceptos técnicos a un lenguaje claro.</li>
+                        </ul>
+                        <ul class="tasks" lang="en">
+                            <li>Delivered advanced instruction in interface design (UI/UX), high-fidelity prototyping, design systems, and web development.</li>
+                            <li><strong>Project Management (ESDAPC):</strong> Mentored and supervised complex user experience projects for higher education students.</li>
+                            <li><strong>Tech Adoption:</strong> Facilitated the learning curve for complex digital tools, translating technical concepts into clear and actionable language.</li>
+                        </ul>
+                    </div>
                 </div>
-                <span class="item-org">Departament d’Educació, Generalitat de Catalunya</span>
-                <ul lang="es">
-                    <li>Docencia avanzada en diseño de interfaces (UI/UX), prototipado y desarrollo web.</li>
-                    <li>Gestión de proyectos (ESDAPC): Mentoría de proyectos complejos de UX para alumnos de grado.</li>
-                    <li>Adopción tecnológica: Traducción de conceptos técnicos a un lenguaje claro y aplicable.</li>
-                </ul>
-                <ul lang="en">
-                    <li>Delivered advanced instruction in UI/UX design, high-fidelity prototyping, and web development.</li>
-                    <li>Project Management (ESDAPC): Mentored and supervised complex UX projects for higher education students.</li>
-                    <li>Tech Adoption: Translating technical concepts into clear and actionable language.</li>
-                </ul>
-            </div>
 
-            <div class="experience-item">
-                <div class="item-header">
-                    <span class="item-title">
-                        <span lang="es">Consultor multimedia y soporte a la docencia</span>
-                        <span lang="en">Multimedia Consultant & Teaching Support</span>
-                    </span>
-                    <span class="item-date">2017 — 2019</span>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3 class="role-title">
+                            <span lang="es">Consultor Multimedia & UX</span>
+                            <span lang="en">Multimedia & UX Consultant</span>
+                        </h3>
+                        <div class="company-info">
+                            <span class="company-name">CRAI, Universitat de Barcelona</span>
+                            <span class="date">2017 — 2019</span>
+                        </div>
+                        <ul class="tasks" lang="es">
+                            <li>Optimización de recursos digitales mediante la creación de guías visuales e interfaces para procesos de registro de contenidos y bases de datos.</li>
+                            <li>Traducción de datos universitarios masivos en material gráfico interactivo y cuadros de mando visuales.</li>
+                        </ul>
+                        <ul class="tasks" lang="en">
+                            <li>Optimized digital resources by creating intuitive visual guides and interfaces for complex workflows and database entry processes.</li>
+                            <li>Translated massive university data into interactive graphic materials and visual dashboards for faculty.</li>
+                        </ul>
+                    </div>
                 </div>
-                <span class="item-org">CRAI, Universitat de Barcelona</span>
-                <ul lang="es">
-                    <li>Traducción de datos universitarios en material gráfico y multimedia adaptable.</li>
-                    <li>Optimización de recursos digitales creando guías visuales de procesos complejos.</li>
-                </ul>
-                <ul lang="en">
-                    <li>Translated university data into graphic and multimedia materials for faculty.</li>
-                    <li>Optimized digital resources by creating visual guides for complex workflows.</li>
-                </ul>
-            </div>
 
-            <div class="experience-item">
-                <div class="item-header">
-                    <span class="item-title">
-                        <span lang="es">Diseñador Web y Multimedia</span>
-                        <span lang="en">Web & Multimedia Designer</span>
-                    </span>
-                    <span class="item-date">2017</span>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h3 class="role-title">
+                            <span lang="es">Diseñador Web y UI</span>
+                            <span lang="en">Web & UI Designer</span>
+                        </h3>
+                        <div class="company-info">
+                            <span class="company-name">SAE, Universitat de Barcelona</span>
+                            <span class="date">2017</span>
+                        </div>
+                        <ul class="tasks" lang="es">
+                            <li>Administración y actualización estructural de los portales web institucionales.</li>
+                            <li>Garantía de la coherencia gráfica, creación de componentes UI y cumplimiento de los estándares corporativos.</li>
+                        </ul>
+                        <ul class="tasks" lang="en">
+                            <li>Administered and structurally updated institutional web portals.</li>
+                            <li>Ensured graphic consistency, created UI components, and adhered to corporate standards to improve overall usability.</li>
+                        </ul>
+                    </div>
                 </div>
-                <span class="item-org">SAE, Universitat de Barcelona</span>
-                <ul lang="es">
-                    <li>Gestión de flujos de datos y bases de datos para registro de cursos.</li>
-                    <li>Mantenimiento y Diseño UI: Administración estructural de portales web institucionales.</li>
-                </ul>
-                <ul lang="en">
-                    <li>Managed databases for course registration and internal management platforms.</li>
-                    <li>UI Design & Maintenance: Structurally updated institutional web portals.</li>
-                </ul>
             </div>
         </section>
 
+        <!-- Skills Section -->
         <section id="skills">
-            <h2 lang="es">Habilidades</h2>
-            <h2 lang="en">Skills</h2>
-            <div class="skills-container">
-                <div>
-                    <h3 lang="es" style="font-size: 1rem;">Técnicas</h3>
-                    <h3 lang="en" style="font-size: 1rem;">Technical</h3>
-                    <span class="skill-tag">Figma</span>
-                    <span class="skill-tag">UI/UX Design</span>
-                    <span class="skill-tag">Design Systems</span>
-                    <span class="skill-tag">Adobe Suite</span>
-                    <span class="skill-tag">HTML/CSS/JS</span>
-                    <span class="skill-tag">WordPress</span>
+            <h2 class="section-title">
+                <span lang="es">Habilidades</span>
+                <span lang="en">Skills</span>
+            </h2>
+            
+            <div class="skills-grid">
+                <!-- Card 1: UI/UX -->
+                <div class="skill-box">
+                    <h3 lang="es">Diseño y Prototipado</h3>
+                    <h3 lang="en">Design & Prototyping</h3>
+                    <div class="chips-container">
+                        <span class="chip">Figma</span>
+                        <span class="chip">UI/UX Design</span>
+                        <span class="chip">Design Systems</span>
+                        <span class="chip">Wireframing</span>
+                        <span class="chip">Info. Architecture</span>
+                    </div>
                 </div>
-                <div>
-                    <h3 lang="es" style="font-size: 1rem;">Blandas</h3>
-                    <h3 lang="en" style="font-size: 1rem;">Soft Skills</h3>
-                    <span class="skill-tag" lang="es">Empatía</span><span class="skill-tag" lang="en">Empathy</span>
-                    <span class="skill-tag" lang="es">Comunicación</span><span class="skill-tag" lang="en">Communication</span>
-                    <span class="skill-tag" lang="es">Resolución de problemas</span><span class="skill-tag" lang="en">Problem Solving</span>
-                    <span class="skill-tag" lang="es">Design Thinking</span><span class="skill-tag" lang="en">Design Thinking</span>
+
+                <!-- Card 2: Tech -->
+                <div class="skill-box">
+                    <h3 lang="es">Herramientas y Web</h3>
+                    <h3 lang="en">Tools & Web Dev</h3>
+                    <div class="chips-container">
+                        <span class="chip">HTML5 / CSS3</span>
+                        <span class="chip">JavaScript</span>
+                        <span class="chip">WordPress</span>
+                        <span class="chip">Adobe Suite</span>
+                        <span class="chip">SAP Fiori</span>
+                    </div>
                 </div>
+
+                <!-- Card 3: Languages -->
+                <div class="skill-box">
+                    <h3 lang="es">Idiomas</h3>
+                    <h3 lang="en">Languages</h3>
+                    <div class="lang-item">
+                        <span>English</span>
+                        <span class="lang-level">C1</span>
+                    </div>
+                    <div class="lang-item">
+                        <span>Español</span>
+                        <span class="lang-level" lang="es">Nativo</span>
+                        <span class="lang-level" lang="en">Native</span>
+                    </div>
+                    <div class="lang-item">
+                        <span>
+                            <span lang="es">Catalán</span>
+                            <span lang="en">Catalan</span>
+                        </span>
+                        <span class="lang-level" lang="es">Nativo</span>
+                        <span class="lang-level" lang="en">Native</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Soft Skills Full Text Card -->
+            <div class="card">
+                <h3 lang="es" style="margin-bottom: 1rem; color: var(--text-main);">Habilidades Blandas</h3>
+                <h3 lang="en" style="margin-bottom: 1rem; color: var(--text-main);">Soft Skills</h3>
+                
+                <ul class="soft-skills-list" lang="es">
+                    <li><strong>Comunicación y formación:</strong> Experiencia en transmitir conceptos técnicos complejos de forma sencilla y efectiva.</li>
+                    <li><strong>Empatía y diseño centrado en el usuario:</strong> Habilidad para identificar puntos de dolor y encontrar soluciones intuitivas.</li>
+                    <li><strong>Resolución de Problemas:</strong> Enfoque analítico para superar desafíos de diseño y funcionalidad.</li>
+                    <li><strong>Capacidad de aprendizaje rápido:</strong> Facilidad para adaptarse en entornos tecnológicos en constante evolución.</li>
+                </ul>
+
+                <ul class="soft-skills-list" lang="en">
+                    <li><strong>Communication & Training:</strong> Experienced in translating complex technical concepts into simple, effective language.</li>
+                    <li><strong>Empathy & User-Centric Design:</strong> Skilled at identifying user pain points and developing intuitive solutions.</li>
+                    <li><strong>Problem Solving:</strong> Analytical approach to overcoming functional and design challenges.</li>
+                    <li><strong>Fast Learner:</strong> Proven ability to adapt quickly to rapidly evolving technological environments.</li>
+                </ul>
             </div>
         </section>
 
+        <!-- Education Section -->
         <section id="education">
-            <h2 lang="es">Educación</h2>
-            <h2 lang="en">Education</h2>
-            <div class="education-item">
-                <span class="item-org">Universitat de Barcelona</span>
-                <div lang="es">Máster en Formación del Profesorado / Grado en Bellas Artes</div>
-                <div lang="en">Master’s Degree in Teacher Training / Bachelor’s Degree in Fine Arts</div>
-            </div>
-            <div class="education-item">
-                <span class="item-org">EASD Serra i Abella / ITES</span>
-                <div lang="es">CFGS Gráfica Publicitaria / CFGS Producción de Audiovisuales</div>
-                <div lang="en">“CFGS” Advertising Graphics / “CFGS” Audiovisual Production</div>
+            <h2 class="section-title">
+                <span lang="es">Formación</span>
+                <span lang="en">Education</span>
+            </h2>
+            <div class="card">
+                
+                <!-- Bloque 1: Formación Académica -->
+                <div class="edu-group">
+                    <h3>
+                        <span lang="es">Formación Académica</span>
+                        <span lang="en">Academic Education</span>
+                    </h3>
+                    
+                    <div class="edu-item">
+                        <div class="edu-school">Universitat de Barcelona</div>
+                        <div class="edu-degree" lang="es">Máster en Formación del Profesorado</div>
+                        <div class="edu-degree" lang="en">Master’s Degree in Teacher Training</div>
+                        <div class="edu-degree" lang="es">Grado en Bellas Artes</div>
+                        <div class="edu-degree" lang="en">Bachelor’s Degree in Fine Arts</div>
+                    </div>
+
+                    <div class="edu-item">
+                        <div class="edu-school">EASD Serra i Abella</div>
+                        <div class="edu-degree" lang="es">CFGS Gráfica Publicitaria</div>
+                        <div class="edu-degree" lang="en">CFGS Advertising Graphics</div>
+                    </div>
+
+                    <div class="edu-item">
+                        <div class="edu-school">ITES</div>
+                        <div class="edu-degree" lang="es">CFGS Producción de Audiovisuales</div>
+                        <div class="edu-degree" lang="en">CFGS Audiovisual Production</div>
+                    </div>
+                </div>
+
+                <!-- Bloque 2: Cursos -->
+                <div class="edu-group">
+                    <h3>
+                        <span lang="es">Cursos y Certificaciones</span>
+                        <span lang="en">Courses & Certifications</span>
+                    </h3>
+
+                    <!-- Coursera -->
+                    <div class="edu-item">
+                        <div class="edu-school">Coursera</div>
+                        <div class="edu-degree" lang="es">Fundamentos del diseño de la experiencia del usuario (UX) | Google</div>
+                        <div class="edu-degree" lang="en">Foundations of User Experience (UX) Design | Google</div>
+                    </div>
+                    
+                    <!-- SAP -->
+                    <div class="edu-item">
+                        <div class="edu-school">SAP Learning Hub</div>
+                        <div class="edu-degree">Basics of Web Development: Developing SAP Fiori Applications with SAPUI5</div>
+                        <div class="edu-degree">Learning the Basics of SAP Fiori: End-User Perspective & Technology</div>
+                        <div class="edu-degree">Exploring SAP's 2026 Strategy</div>
+                        <div class="edu-degree">Discovering Fundamental Cloud Concepts</div>
+                    </div>
+
+                    <!-- UPC -->
+                    <div class="edu-item">
+                        <div class="edu-school">Universitat Politècnica de Catalunya (JEDI Junior Empresa)</div>
+                        <div class="edu-degree" lang="es">Multimedia</div>
+                        <div class="edu-degree" lang="en">Multimedia</div>
+                        <div class="edu-degree" lang="es">Diseño gráfico</div>
+                        <div class="edu-degree" lang="en">Graphic Design</div>
+                    </div>
+
+                    <!-- Additional Training -->
+                    <div class="edu-item">
+                        <div class="edu-school">
+                            <span lang="es">Formación Complementaria</span>
+                            <span lang="en">Additional Training</span>
+                        </div>
+                        <div class="edu-degree" lang="es">Competencia digital docente (Nivel A2) | Generalitat de Catalunya</div>
+                        <div class="edu-degree" lang="en">Digital Teaching Competence (Level A2) | Generalitat de Catalunya</div>
+                        
+                        <div class="edu-degree" lang="es">Formación continua en metodologías docentes</div>
+                        <div class="edu-degree" lang="en">Continuous Training in Teaching Methodologies</div>
+                        
+                        <div class="edu-degree" lang="es">Formación técnica para docencia universitaria | CRAI, Universitat de Barcelona</div>
+                        <div class="edu-degree" lang="en">Technical Training for University Teaching | CRAI, University of Barcelona</div>
+                        
+                        <div class="edu-degree" lang="es">Edición de vídeo no lineal (AVID) | ECIB</div>
+                        <div class="edu-degree" lang="en">Non-Linear Video Editing (AVID) | ECIB</div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
-        <footer>
-            <p lang="es">¿Hablamos?</p>
-            <p lang="en">Let's talk?</p>
+        <!-- Contact Section -->
+        <section class="contact-cta" id="contact">
+            <h2 lang="es">¿Creamos algo increíble?</h2>
+            <h2 lang="en">Let's build something great.</h2>
+            <p lang="es">Actualmente buscando nuevas oportunidades como Product Designer.</p>
+            <p lang="en">Currently looking for new opportunities as a Product Designer.</p>
+            
+            <!-- Email Injected via JS -->
             <div id="email-container"></div>
-        </footer>
-    </div>
+        </section>
+
+    </main>
 
     <script>
         // Lógica de Idioma
         function toggleLang() {
             const body = document.body;
             const btn = document.getElementById('langBtn');
-            if (body.classList.contains('lang-es')) {
-                body.classList.remove('lang-es');
-                body.classList.add('lang-en');
-                btn.innerText = '🇪🇸 Castellano';
-            } else {
+            
+            if (body.classList.contains('lang-en')) {
                 body.classList.remove('lang-en');
                 body.classList.add('lang-es');
-                btn.innerText = '🇬🇧 English';
+                btn.innerHTML = '🌐 EN'; 
+            } else {
+                body.classList.remove('lang-es');
+                body.classList.add('lang-en');
+                btn.innerHTML = '🌐 ES';
             }
         }
 
-        // Lógica de Tema
+        // Lógica de Tema (Dark/Light)
         function toggleTheme() {
             const body = document.body;
-            const btn = document.getElementById('themeBtn');
+            const themeIcon = document.getElementById('themeIcon');
             const currentTheme = body.getAttribute('data-theme');
+            
             if (currentTheme === 'light') {
                 body.setAttribute('data-theme', 'dark');
-                btn.innerText = '☀️ Light Mode';
+                themeIcon.innerText = '☀️';
             } else {
                 body.setAttribute('data-theme', 'light');
-                btn.innerText = '🌙 Dark Mode';
+                themeIcon.innerText = '🌙';
             }
         }
 
-        // Protección Anti-Spam para el Email
-        // Se construye el email dinámicamente para que no aparezca en el HTML bruto
+        // Protección Anti-Spam
         window.onload = function() {
             const user = "alexgfdev";
             const domain = "gmail.com";
             const container = document.getElementById('email-container');
+            
             const email = user + "@" + domain;
             const link = document.createElement('a');
             link.href = "mailto:" + email;
-            link.className = "email-link";
-            link.innerText = email;
+            link.className = "email-btn";
+            
+            const iconSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>`;
+            
+            link.innerHTML = iconSvg + "<span>" + email + "</span>";
             container.appendChild(link);
         }
     </script>
