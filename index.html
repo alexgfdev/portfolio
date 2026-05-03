@@ -14,7 +14,7 @@
     <meta property="og:title" content="Àlex GF | UI/UX & Product Designer">
     <meta property="og:description" content="Portfolio of Àlex GF, Product & UI/UX Designer specialized in streamlining complex processes and user-centric design.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tu-dominio.com">
+    <meta property="og:url" content="https://www.alexgf.dev/">
     <meta property="og:image" content="https://via.placeholder.com/1200x630/1E7DE3/FFFFFF?text=%C3%80lex+GF+-+Product+Designer"> 
 
     <!-- Favicon SVG Integrado -->
@@ -118,6 +118,12 @@
             font-weight: 800;
             font-size: 1.2rem;
             letter-spacing: -0.5px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        
+        .logo:hover {
+            color: var(--accent-primary);
         }
 
         /* Main Menu Links & ScrollSpy */
@@ -634,7 +640,8 @@
     <!-- Navigation -->
     <nav>
         <div class="container nav-content">
-            <div class="logo">Àlex GF</div>
+            <!-- El logo ahora es un enlace que lleva al inicio (href="#") -->
+            <a href="#" class="logo" aria-label="Volver al inicio / Go to top">Àlex GF</a>
             
             <div class="nav-links">
                 <a href="#about" aria-label="Go to About Section">
@@ -978,7 +985,23 @@
     </main>
 
     <script>
-        // Lógica de Idioma
+        // --- DETECCIÓN DE IDIOMA POR URL ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const langParam = urlParams.get('lang');
+            
+            // Si en la url viene "?lang=es", forzamos castellano al cargar
+            if (langParam === 'es') {
+                const body = document.body;
+                const btn = document.getElementById('langBtn');
+                
+                body.classList.remove('lang-en');
+                body.classList.add('lang-es');
+                btn.innerHTML = '🌐 EN'; 
+            }
+        });
+
+        // Lógica de Idioma (Botón)
         function toggleLang() {
             const body = document.body;
             const btn = document.getElementById('langBtn');
