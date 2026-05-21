@@ -21,7 +21,7 @@
             padding: 0;
             user-select: none;
             -webkit-user-select: none;
-            touch-action: manipulation;
+            touch-action: manipulation; /* Evita delays táctiles */
         }
 
         body {
@@ -51,7 +51,6 @@
             opacity: 0.8;
         }
 
-        /* Marcador de puntuación y turnos */
         .scoreboard {
             display: flex;
             justify-content: center;
@@ -85,10 +84,10 @@
             height: 14px;
             border-radius: 50%;
         }
+        
         .dot-indicator.p1 { background: var(--p1-color); box-shadow: 0 0 8px var(--p1-color); }
         .dot-indicator.p2 { background: var(--p2-color); box-shadow: 0 0 8px var(--p2-color); }
 
-        /* Contenedor del área de juego */
         .board-container {
             width: 100%;
             max-width: 380px;
@@ -106,38 +105,44 @@
             overflow: visible;
         }
 
-        /* Estilos de los elementos del juego */
         .grid-dot {
             fill: var(--dot-color);
-            transition: fill 0.3s;
         }
 
-        /* Líneas invisibles pero anchas para facilitar el toque táctil */
         .click-zone {
             stroke: transparent;
             stroke-linecap: round;
             cursor: pointer;
         }
 
-        /* La línea visual que ve el jugador */
         .visual-line {
             stroke: var(--line-ghost);
             stroke-linecap: round;
-            transition: stroke 0.2s, stroke-width 0.2s;
-            pointer-events: none; /* No interfiere con el toque */
+            transition: stroke 0.15s ease, filter 0.15s ease;
+            pointer-events: none; 
         }
 
-        /* Animación y feedback visual al pulsar o pasar por encima */
-        .click-zone:active ~ .visual-line,
-        .click-zone:hover ~ .visual-line {
-            stroke: rgba(255,255,255,0.3);
+        /* Feedback visual ANTES de pulsar, solo si la línea NO tiene color de jugador */
+        .click-zone:active ~ .visual-line:not(.taken-p1):not(.taken-p2) {
+            stroke: rgba(255,255,255,0.4);
+        }
+        
+        @media (hover: hover) {
+            .click-zone:hover ~ .visual-line:not(.taken-p1):not(.taken-p2) {
+                stroke: rgba(255,255,255,0.3);
+            }
         }
 
-        /* Líneas definitivas de los jugadores */
-        .visual-line.taken-p1 { stroke: var(--p1-color); filter: drop-shadow(0px 0px 4px var(--p1-color)); }
-        .visual-line.taken-p2 { stroke: var(--p2-color); filter: drop-shadow(0px 0px 4px var(--p2-color)); }
+        /* Colores definitivos (usamos !important para asegurar que anulen cualquier gris de hover/active) */
+        .visual-line.taken-p1 { 
+            stroke: var(--p1-color) !important; 
+            filter: drop-shadow(0px 0px 6px var(--p1-color)); 
+        }
+        .visual-line.taken-p2 { 
+            stroke: var(--p2-color) !important; 
+            filter: drop-shadow(0px 0px 6px var(--p2-color)); 
+        }
 
-        /* Cuadrados conquistados */
         .box-fill {
             opacity: 0;
             transform: scale(0);
@@ -145,8 +150,8 @@
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .box-fill.taken-p1 { fill: var(--p1-color); opacity: 0.15; transform: scale(1); }
-        .box-fill.taken-p2 { fill: var(--p2-color); opacity: 0.15; transform: scale(1); }
+        .box-fill.taken-p1 { fill: var(--p1-color); opacity: 0.2; transform: scale(1); }
+        .box-fill.taken-p2 { fill: var(--p2-color); opacity: 0.2; transform: scale(1); }
 
         footer {
             width: 100%;
@@ -175,7 +180,6 @@
             background-color: #57606f;
         }
 
-        /* Pantalla de Fin de Juego */
         .overlay {
             display: none;
             position: fixed;
@@ -233,14 +237,14 @@
     </div>
 
     <script>
-        const GRID_SIZE = 5; // 5x5 puntos = 4x4 cuadrados (16 en total)
-        const SPACING = 80;  // Distancia en píxeles SVG entre puntos
-        const OFFSET = 40;   // Margen para que no se corten los bordes
+        const GRID_SIZE = 5; 
+        const SPACING = 80;  
+        const OFFSET = 40;   
 
         let currentPlayer = 1;
         let scores = { 1: 0, 2: 0 };
-        let linesState = {}; // Guarda qué líneas han sido pulsadas
-        let boxesState = []; // Guarda el estado de los 16 cuadrados
+        let linesState = {}; 
+        let boxesState = []; 
 
         const svg = document.getElementById('game-svg');
         const overlay = document.getElementById('overlay');
@@ -248,8 +252,8 @@
         const resetBtn = document.getElementById('resetBtn');
         const overlayResetBtn = document.getElementById('overlayResetBtn');
 
-        // Audio Sintetizado Móvil
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
         function playSound(type) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
@@ -264,8 +268,8 @@
                 osc.start(); osc.stop(audioCtx.currentTime + 0.15);
             } else if (type === 'box') {
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // Nota Do
-                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // Nota Mi
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); 
                 gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.25);
             } else if (type === 'win') {
@@ -287,17 +291,16 @@
             overlay.style.display = 'none';
             updateUI();
 
-            // 1. Crear lógicamente y dibujar los contenedores de los cuadrados (capa de fondo)
             for (let r = 0; r < GRID_SIZE - 1; r++) {
                 for (let c = 0; c < GRID_SIZE - 1; c++) {
                     const boxId = `box-${r}-${c}`;
                     boxesState.push({
                         id: boxId, row: r, col: c, filled: false,
                         lines: [
-                            `h-${r}-${c}`,     // Línea superior
-                            `h-${r+1}-${c}`,   // Línea inferior
-                            `v-${r}-${c}`,     // Línea izquierda
-                            `v-${r}-${c+1}`    // Línea derecha
+                            `h-${r}-${c}`,     
+                            `h-${r+1}-${c}`,   
+                            `v-${r}-${c}`,     
+                            `v-${r}-${c+1}`    
                         ]
                     });
 
@@ -312,27 +315,24 @@
                 }
             }
 
-            // 2. Generar interactividad de líneas (Líneas horizontales y verticales)
-            // Horizontales
             for (let r = 0; r < GRID_SIZE; r++) {
                 for (let c = 0; c < GRID_SIZE - 1; c++) {
                     createLine(`h-${r}-${c}`, c * SPACING + OFFSET, r * SPACING + OFFSET, (c + 1) * SPACING + OFFSET, r * SPACING + OFFSET);
                 }
             }
-            // Verticales
+            
             for (let r = 0; r < GRID_SIZE - 1; r++) {
                 for (let c = 0; c < GRID_SIZE; c++) {
                     createLine(`v-${r}-${c}`, c * SPACING + OFFSET, r * SPACING + OFFSET, c * SPACING + OFFSET, (r + 1) * SPACING + OFFSET);
                 }
             }
 
-            // 3. Dibujar los puntos del mapa (Capa superior visual)
             for (let r = 0; r < GRID_SIZE; r++) {
                 for (let c = 0; c < GRID_SIZE; c++) {
                     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                     circle.setAttribute("cx", c * SPACING + OFFSET);
                     circle.setAttribute("cy", r * SPACING + OFFSET);
-                    circle.setAttribute("r", "6");
+                    circle.setAttribute("r", "5");
                     circle.setAttribute("class", "grid-dot");
                     svg.appendChild(circle);
                 }
@@ -340,12 +340,10 @@
         }
 
         function createLine(id, x1, y1, x2, y2) {
-            linesState[id] = 0; // 0 = libre
+            linesState[id] = 0; 
 
-            // Grupo contenedor para estructurar capas (Zona de click + Línea visual)
             const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
 
-            // Línea visual fina trasera
             const vLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
             vLine.setAttribute("x1", x1); vLine.setAttribute("y1", y1);
             vLine.setAttribute("x2", x2); vLine.setAttribute("y2", y2);
@@ -353,14 +351,12 @@
             vLine.setAttribute("class", "visual-line");
             vLine.setAttribute("id", `visual-${id}`);
 
-            // Zona invisible ultra-ancha delantera optimizada para el dedo
             const cZone = document.createElementNS("http://www.w3.org/2000/svg", "line");
             cZone.setAttribute("x1", x1); cZone.setAttribute("y1", y1);
             cZone.setAttribute("x2", x2); cZone.setAttribute("y2", y2);
-            cZone.setAttribute("stroke-width", "24"); // Área táctil generosa
+            cZone.setAttribute("stroke-width", "26"); 
             cZone.setAttribute("class", "click-zone");
 
-            // Captura de pulsación inmediata en smartphones sin lag
             cZone.addEventListener('pointerdown', (e) => {
                 e.preventDefault();
                 handleLineClick(id);
@@ -372,28 +368,25 @@
         }
 
         function handleLineClick(id) {
-            if (linesState[id] !== 0) return; // Línea ya ocupada
+            if (linesState[id] !== 0) return; 
 
             linesState[id] = currentPlayer;
             
-            // Pintar la línea visual del color del jugador actual
             const vLine = document.getElementById(`visual-${id}`);
-            vLine.classList.add(`taken-p1`, `taken-p${currentPlayer}`);
+            // Corrección: Solo añadimos la clase del jugador que toca
+            vLine.classList.add(`taken-p${currentPlayer}`);
 
             let boxClosedThisTurn = false;
             playSound('line');
 
-            // Verificar si este movimiento cierra uno o más cuadrados
             boxesState.forEach(box => {
                 if (!box.filled) {
-                    // Si todas las líneas que componen este cuadrado están marcadas (!= 0)
                     const allLinesTaken = box.lines.every(lineId => linesState[lineId] !== 0);
                     if (allLinesTaken) {
                         box.filled = true;
                         boxClosedThisTurn = true;
                         scores[currentPlayer]++;
                         
-                        // Iluminar el cuadrado con el color del dueño
                         const rect = document.getElementById(box.id);
                         rect.classList.add(`taken-p${currentPlayer}`);
                     }
@@ -402,11 +395,9 @@
 
             if (boxClosedThisTurn) {
                 playSound('box');
-                // Si completas cuadrado, sigues jugando (No se cambia el turno)
                 updateUI();
                 checkGameOver();
             } else {
-                // Si no completas cuadrado, pasa el turno al rival
                 currentPlayer = currentPlayer === 1 ? 2 : 1;
                 updateUI();
             }
@@ -421,7 +412,6 @@
         }
 
         function checkGameOver() {
-            // El juego termina cuando se completan los 16 cuadrados (4x4)
             const allFilled = boxesState.every(box => box.filled);
             if (allFilled) {
                 let msg = "";
@@ -433,14 +423,13 @@
                 setTimeout(() => {
                     overlayText.textContent = msg;
                     overlay.style.display = 'flex';
-                }, 500);
+                }, 400);
             }
         }
 
         resetBtn.addEventListener('click', initGame);
         overlayResetBtn.addEventListener('click', initGame);
 
-        // Iniciar al cargar el archivo
         initGame();
     </script>
 </body>
