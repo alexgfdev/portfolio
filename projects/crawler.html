@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Solo Dungeon - RPG Levels</title>
+    <style>
+        :root {
+            --bg-color: #0f0f13;
+            --panel-color: #1a1a24;
+            --card-bg: #232330;
+            --card-border: #4a4a5a;
+            --text-color: #e0e0e0;
+            --accent-red: #ff4757;
+            --accent-xp: #00d2d3;
+            --accent-green: #2ed573;
+            --accent-blue: #1e90ff;
+            --accent-purple: #9c88ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            padding: 15px;
+        }
+
+        header {
+            width: 100%; max-width: 400px; display: flex; justify-content: space-between;
+            align-items: center; background: var(--panel-color); padding: 12px 20px;
+            border-radius: 12px; margin-bottom: 10px; border: 1px solid #2a2a35;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 10;
+        }
+
+        .stat { display: flex; flex-direction: column; align-items: center; font-weight: 700; font-size: 1.1rem; }
+        .stat span:first-child { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #888; }
+        .stat-hp { color: var(--accent-red); }
+        .stat-atk { color: var(--accent-blue); }
+        .stat-xp { color: var(--accent-xp); }
+
+        .skill-bar {
+            width: 100%; max-width: 400px; display: flex; justify-content: space-between;
+            align-items: center; background: #1e1e28; padding: 10px 15px; border-radius: 8px;
+            margin-bottom: 15px; border: 1px solid #333; z-index: 10; transition: box-shadow 0.3s;
+        }
+
+        .skill-info { display: flex; align-items: center; gap: 10px; }
+        .skill-icon { font-size: 1.5rem; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50%; }
+        
+        .skill-header { display: flex; align-items: baseline; gap: 8px; }
+        .skill-name { font-size: 0.9rem; font-weight: bold; color: var(--accent-purple); }
+        .skill-level { font-size: 0.7rem; background: var(--accent-xp); color: #000; padding: 2px 6px; border-radius: 10px; font-weight: 900; }
+        
+        .skill-desc { font-size: 0.7rem; color: #888; margin-top: 2px; }
+
+        .btn-skill {
+            background: var(--accent-purple); color: white; border: none; padding: 8px 14px;
+            border-radius: 6px; font-weight: bold; font-size: 0.85rem; cursor: pointer;
+            transition: transform 0.1s, filter 0.2s; box-shadow: 0 2px 8px rgba(156, 136, 255, 0.4);
+        }
+
+        .btn-skill:active:not(:disabled) { transform: scale(0.95); }
+        .btn-skill:disabled { background: #333; color: #777; box-shadow: none; pointer-events: none; }
+
+        .progress {
+            position: absolute; top: 135px; font-size: 0.85rem; color: #888;
+            font-weight: bold; letter-spacing: 1px; text-transform: uppercase; z-index: 10;
+        }
+
+        .room-selection {
+            flex-grow: 1; width: 100%; max-width: 400px; display: flex;
+            flex-direction: column; justify-content: center; gap: 10px; z-index: 5;
+        }
+
+        .room-selection-title {
+            text-align: center; font-size: 1.1rem; font-weight: 800; margin-bottom: 5px;
+            color: #aaa; text-transform: uppercase; letter-spacing: 2px;
+        }
+
+        .room-option {
+            background: linear-gradient(90deg, #1e1e28, #15151e); border: 1px solid var(--card-border);
+            border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 15px;
+            cursor: pointer; transition: transform 0.2s, border-color 0.2s; box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+        }
+
+        .room-option:nth-child(1) { animation-delay: 0.1s; }
+        .room-option:nth-child(2) { animation-delay: 0.2s; }
+        .room-option:nth-child(3) { animation-delay: 0.3s; }
+        .room-option:active { transform: scale(0.96); }
+
+        .room-icon { font-size: 2.5rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); min-width: 45px; text-align: center; }
+        .room-info { display: flex; flex-direction: column; flex-grow: 1; }
+        .room-header-inner { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+        .room-name { font-size: 1rem; font-weight: 700; }
+        
+        .room-type {
+            font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;
+            padding: 2px 6px; border-radius: 6px; background: rgba(0,0,0,0.4);
+        }
+        
+        .room-desc { font-size: 0.8rem; color: #aaa; line-height: 1.3; margin-bottom: 6px; }
+        .room-stat-badge {
+            display: inline-flex; align-items: center; font-size: 0.8rem;
+            font-weight: bold; padding: 4px 8px; border-radius: 6px;
+            background: rgba(0,0,0,0.5); width: fit-content;
+        }
+
+        @keyframes slideIn { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .card-container {
+            flex-grow: 1; width: 100%; max-width: 320px; position: relative;
+            perspective: 1000px; display: none; justify-content: center; align-items: center; margin: 0 auto;
+        }
+
+        .card {
+            width: 100%; aspect-ratio: 2.5 / 3.5; background: linear-gradient(135deg, var(--card-bg), #1a1a24);
+            border: 2px solid var(--card-border); border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 0 0 4px rgba(255,255,255,0.05);
+            display: flex; flex-direction: column; align-items: center; padding: 20px;
+            position: absolute; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s; transform-style: preserve-3d;
+        }
+
+        .card.exit-left { transform: translateX(-150%) rotate(-15deg); opacity: 0; }
+        .card.exit-right { transform: translateX(150%) rotate(15deg); opacity: 0; }
+        .card.enter { transform: translateY(-100px) rotateX(45deg) scale(0.8); opacity: 0; }
+        .card.active { transform: translateY(0) rotateX(0) scale(1); opacity: 1; z-index: 5; }
+
+        .card-type {
+            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;
+            margin-bottom: 15px; padding: 4px 10px; border-radius: 20px; background: rgba(0,0,0,0.3);
+        }
+
+        .type-monster { color: var(--accent-red); border-bottom: 1px solid var(--accent-red); }
+        .type-essence { color: var(--accent-xp); border-bottom: 1px solid var(--accent-xp); }
+        .type-event { color: var(--accent-green); border-bottom: 1px solid var(--accent-green); }
+        .type-merchant { color: var(--accent-blue); border-bottom: 1px solid var(--accent-blue); }
+
+        .card-icon { font-size: 5rem; margin: 10px 0; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
+        .card-title { font-size: 1.4rem; font-weight: 800; text-align: center; margin-bottom: 5px; }
+        .card-desc { font-size: 0.9rem; text-align: center; color: #aaa; line-height: 1.4; flex-grow: 1; display: flex; align-items: center; }
+        .card-stats { display: flex; gap: 15px; margin-top: 10px; }
+        .c-stat { background: rgba(0,0,0,0.4); padding: 5px 12px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; }
+
+        .controls { width: 100%; max-width: 400px; display: none; gap: 15px; margin-top: 15px; margin-bottom: 10px; }
+        .btn {
+            flex: 1; padding: 16px; border: none; border-radius: 12px;
+            font-size: 1.1rem; font-weight: 700; cursor: pointer;
+            transition: transform 0.1s, filter 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn:disabled { filter: grayscale(1); opacity: 0.5; pointer-events: none; }
+        .btn-dodge { background: #2f3542; color: #fff; }
+        .btn-action { background: var(--accent-red); color: #fff; }
+
+        .overlay {
+            display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.95); z-index: 20; flex-direction: column;
+            align-items: center; justify-content: flex-start; padding: 40px 20px; text-align: center;
+            overflow-y: auto;
+        }
+
+        .overlay h2 { font-size: 2rem; margin-bottom: 20px; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+        .overlay p { font-size: 1.2rem; color: #aaa; margin-bottom: 20px; }
+        .win-text { color: var(--accent-xp) !important; }
+        .lose-text { color: var(--accent-red) !important; }
+
+        .hero-grid { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 350px; margin-bottom: 30px; }
+        .hero-card {
+            background: var(--panel-color); border: 2px solid var(--card-border);
+            border-radius: 12px; padding: 15px; display: flex; align-items: center;
+            gap: 15px; cursor: pointer; text-align: left; transition: transform 0.2s, border-color 0.2s;
+        }
+        .hero-card:active { transform: scale(0.95); }
+        .hero-icon { font-size: 2.5rem; background: rgba(0,0,0,0.3); border-radius: 50%; padding: 10px; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; }
+        .hero-details h3 { font-size: 1.2rem; color: #fff; margin-bottom: 5px; }
+        .hero-stats { font-size: 0.8rem; color: #aaa; margin-bottom: 5px; }
+        .hero-power { font-size: 0.75rem; color: var(--accent-purple); font-weight: bold; }
+
+        .log {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 1.5rem; font-weight: bold; pointer-events: none; opacity: 0; z-index: 30;
+            text-align: center; white-space: nowrap;
+        }
+
+        @keyframes floatUp { 0% { transform: translate(-50%, -50%); opacity: 1; } 100% { transform: translate(-50%, -150%); opacity: 0; } }
+        
+        @keyframes flashLvl { 0% { box-shadow: 0 0 20px var(--accent-xp); } 100% { box-shadow: 0 0 0px transparent; } }
+        .lvl-up-anim { animation: flashLvl 1s ease-out; }
+    </style>
+</head>
+<body>
+
+    <div class="overlay" id="heroOverlay">
+        <h2>Elige a tu Héroe</h2>
+        <div class="hero-grid" id="heroGrid"></div>
+    </div>
+
+    <div class="overlay" id="endOverlay" style="display: none; justify-content: center;">
+        <h2 id="endTitle">Fin del Juego</h2>
+        <p id="endDesc">Has sucumbido en la oscuridad.</p>
+        <button class="btn btn-action" style="background: var(--accent-blue); max-width: 300px;" onclick="showHeroSelection()">Jugar de nuevo</button>
+    </div>
+
+    <header>
+        <div class="stat stat-hp"><span>Vida</span><div id="ui-hp">10</div></div>
+        <div class="stat stat-atk"><span>Ataque</span><div id="ui-atk">2</div></div>
+        <div class="stat stat-xp"><span>Experiencia</span><div id="ui-xp">0</div></div>
+    </header>
+
+    <div class="skill-bar" id="skillBar">
+        <div class="skill-info">
+            <div class="skill-icon" id="ui-skill-icon">✨</div>
+            <div>
+                <div class="skill-header">
+                    <div class="skill-name" id="ui-skill-name">Habilidad</div>
+                    <div class="skill-level" id="ui-skill-lvl">NVL 1</div>
+                </div>
+                <div class="skill-desc" id="ui-skill-desc">Descripción</div>
+            </div>
+        </div>
+        <button class="btn-skill" id="btnSkill">USAR</button>
+    </div>
+
+    <div class="progress" id="ui-progress">PISO: 1/4 - SALA: 1/5</div>
+
+    <div class="room-selection" id="roomSelection">
+        <div class="room-selection-title">Avanza en la oscuridad</div>
+        <div id="roomOptionsContainer"></div>
+    </div>
+
+    <div class="card-container" id="cardArea"></div>
+
+    <div class="controls" id="controlsArea">
+        <button class="btn btn-dodge" id="btnDodge">Esquivar (-1 HP)</button>
+        <button class="btn btn-action" id="btnAction">Enfrentar</button>
+    </div>
+
+    <script>
+        const MAX_DEPTH = 4;
+        const ROOMS_PER_DEPTH = 5;
+        const XP_LVL_2 = 12;
+        const XP_LVL_3 = 24;
+        
+        let hp = 0, atk = 0, xp = 0, totalXp = 0, hpMax = 20;
+        let currentDepth = 1, currentRoom = 1;
+        
+        let activeCard = null;
+        let isAnimating = false;
+        let currentHero = null;
+        let heroLevel = 1;
+        let skillUsedThisDepth = false; 
+        let knightBuff = 0; 
+        
+        let usedBeneficialThisDepth = { essence: false, event: false, merchant: false };
+
+        const heroesData = [
+            { 
+                id: 'caballero', name: 'Caballero Vanguardia', icon: '⚔️', hp: 12, atk: 2, 
+                skillIcon: '🗡️', skillName: 'Golpe Poderoso',
+                levels: { 1: '+4 ATK temporal.', 2: '+6 ATK temporal.', 3: '+9 ATK temporal.' }
+            },
+            { 
+                id: 'asesino', name: 'Sombra Silenciosa', icon: '🥷', hp: 9, atk: 2, 
+                skillIcon: '💨', skillName: 'Evasión Perfecta',
+                levels: { 1: 'Esquiva gratis (No Jefes).', 2: 'Esquiva gratis y recuperas 2 HP.', 3: 'Esquiva, cura 3 HP y ganas +1 ATK.' }
+            },
+            { 
+                id: 'paladin', name: 'Clérigo del Alba', icon: '🛡️', hp: 11, atk: 1, 
+                skillIcon: '✨', skillName: 'Sanación Divina',
+                levels: { 1: 'Recuperas 5 Vida.', 2: 'Recuperas 8 Vida.', 3: 'Recuperas 10 Vida y ganas +1 ATK.' }
+            },
+            { 
+                id: 'hechicero', name: 'Mago Arcano', icon: '🔮', hp: 8, atk: 3, 
+                skillIcon: '🧪', skillName: 'Transmutación',
+                levels: { 1: 'Transmuta monstruo en 3 XP.', 2: 'Transmuta en 5 XP y 2 HP.', 3: 'Transmuta en 5 XP, 5 HP y +1 ATK.' }
+            }
+        ];
+
+        const monsterPool = [
+            { type: 'monster', name: 'Goblin Zapador', icon: '👺', atk: 2, desc: 'Lleva explosivos inestables.' },
+            { type: 'monster', name: 'Orco Berserker', icon: '👹', atk: 3, desc: 'Ataca con furia ciega.' },
+            { type: 'monster', name: 'Espectro del Vacío', icon: '👻', atk: 3, desc: 'Su toque drena la voluntad.' },
+            { type: 'monster', name: 'Cieno Ácido', icon: '🦠', atk: 2, desc: 'Corroe las armas al contacto.' },
+            { type: 'monster', name: 'Caballero Caído', icon: '💀', atk: 4, desc: 'Antiguo héroe consumido por la oscuridad.' }
+        ];
+
+        const eventPool = [
+            { type: 'essence', name: 'Tomo de Sabiduría', icon: '📘', val: 3, desc: 'Conocimientos arcanos aumentan tu experiencia.' },
+            { type: 'essence', name: 'Piedra de Alma', icon: '💠', val: 2, desc: 'Fragmentos de energía cristalizada.' },
+            { type: 'event', name: 'Santuario Lunar', icon: '⛲', val: 3, desc: 'Aguas cristalinas que curan heridas.' },
+            { type: 'merchant', name: 'Altar de Poder', icon: '🕯️', cost: 4, desc: 'Ofrece experiencia a los dioses para fortalecerte.' }
+        ];
+
+        const transitionCard = { type: 'event', name: 'Escaleras Profundas', icon: '🪜', val: 0, desc: 'Las sombras se espesan mientras desciendes al siguiente nivel. No hay tiempo para descansar.' };
+        
+        // Jefes de la Planta 2
+        const midBossPool = [
+            { type: 'monster', name: 'Guardián de Piedra', icon: '🗿', atk: 6, lootXp: 3, lootHp: 1, desc: 'Un coloso implacable de roca y musgo sangriento.' },
+            { type: 'monster', name: 'Sacerdote Carmesí', icon: '🩸', atk: 5, lootXp: 3, lootHp: 2, desc: 'Realiza rituales prohibidos que drenan tu esencia.' },
+            { type: 'monster', name: 'Mantícora Oscura', icon: '🦅', atk: 7, lootXp: 4, lootHp: 0, desc: 'Una bestia letal fusionada con pura pesadilla.' }
+        ];
+
+        const finalBossCard = { type: 'monster', name: 'Señor del Abismo', icon: '👿', atk: 9, lootXp: 5, lootHp: 2, desc: 'Gobernante absoluto de la mazmorra. Es matar o morir.' };
+
+        const typeLabels = { 'monster': 'Monstruo', 'essence': 'Conocimiento', 'event': 'Evento', 'merchant': 'Altar' };
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            
+            if (type === 'hit') { 
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, audioCtx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.2); 
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2); 
+                osc.start(); osc.stop(audioCtx.currentTime + 0.2); 
+            } else if (type === 'safe') { 
+                osc.type = 'sine'; osc.frequency.setValueAtTime(400, audioCtx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.15); 
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15); 
+                osc.start(); osc.stop(audioCtx.currentTime + 0.15); 
+            } else if (type === 'xp') { 
+                osc.type = 'sine'; osc.frequency.setValueAtTime(1200, audioCtx.currentTime); osc.frequency.setValueAtTime(1600, audioCtx.currentTime + 0.1); 
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3); 
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3); 
+            } else if (type === 'heal') { 
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.linearRampToValueAtTime(600, audioCtx.currentTime + 0.3); 
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4); 
+                osc.start(); osc.stop(audioCtx.currentTime + 0.4); 
+            } else if (type === 'upgrade' || type === 'skill') { 
+                osc.type = 'square'; osc.frequency.setValueAtTime(400, audioCtx.currentTime); osc.frequency.setValueAtTime(800, audioCtx.currentTime + 0.1); 
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.4); 
+                osc.start(); osc.stop(audioCtx.currentTime + 0.4); 
+            } else if (type === 'select') { 
+                osc.type = 'sine'; osc.frequency.setValueAtTime(600, audioCtx.currentTime); 
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1); 
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1); 
+            } else if (type === 'levelUp') {
+                osc.type = 'square'; 
+                [400, 500, 600, 800].forEach((f, i) => osc.frequency.setValueAtTime(f, audioCtx.currentTime + i * 0.1));
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.6); 
+                osc.start(); osc.stop(audioCtx.currentTime + 0.6); 
+            }
+        }
+
+        function spawnLog(text, color) {
+            const log = document.createElement('div'); log.className = 'log'; log.style.color = color; log.textContent = text;
+            document.body.appendChild(log); log.style.animation = 'floatUp 1.2s forwards'; setTimeout(() => log.remove(), 1200);
+        }
+
+        function showHeroSelection() {
+            document.getElementById('endOverlay').style.display = 'none';
+            const heroGrid = document.getElementById('heroGrid'); heroGrid.innerHTML = '';
+            heroesData.forEach(hero => {
+                const hEl = document.createElement('div'); hEl.className = 'hero-card';
+                hEl.innerHTML = `
+                    <div class="hero-icon">${hero.icon}</div>
+                    <div class="hero-details">
+                        <h3>${hero.name}</h3>
+                        <div class="hero-stats">❤️ ${hero.hp} | ⚔️ ${hero.atk}</div>
+                        <div class="hero-power">${hero.skillIcon} ${hero.skillName}</div>
+                    </div>
+                `;
+                hEl.addEventListener('click', () => { playSound('select'); startGame(hero); });
+                heroGrid.appendChild(hEl);
+            });
+            document.getElementById('heroOverlay').style.display = 'flex';
+        }
+
+        function startGame(hero) {
+            document.getElementById('heroOverlay').style.display = 'none';
+            currentHero = hero; hp = hero.hp; atk = hero.atk; 
+            xp = 0; totalXp = 0; heroLevel = 1;
+            currentDepth = 1; currentRoom = 1; skillUsedThisDepth = false; knightBuff = 0;
+            usedBeneficialThisDepth = { essence: false, event: false, merchant: false };
+
+            updateSkillUI();
+            updateStats();
+            showRoomOptions();
+        }
+
+        function updateSkillUI() {
+            document.getElementById('ui-skill-icon').textContent = currentHero.skillIcon;
+            document.getElementById('ui-skill-name').textContent = currentHero.skillName;
+            document.getElementById('ui-skill-lvl').textContent = `NVL ${heroLevel}`;
+            document.getElementById('ui-skill-desc').textContent = currentHero.levels[heroLevel];
+        }
+
+        function addXp(amount) {
+            xp += amount;
+            totalXp += amount;
+            
+            if (heroLevel === 1 && totalXp >= XP_LVL_2) {
+                heroLevel = 2;
+                atk += 1;
+                setTimeout(() => { playSound('levelUp'); spawnLog("¡NIVEL 2 (+1 ATK)!", "var(--accent-xp)"); updateSkillUI(); animateLevelUp(); updateStats(); }, 500);
+            } else if (heroLevel === 2 && totalXp >= XP_LVL_3) {
+                heroLevel = 3;
+                atk += 1;
+                setTimeout(() => { playSound('levelUp'); spawnLog("¡NIVEL MAX (+1 ATK)!", "var(--accent-xp)"); updateSkillUI(); animateLevelUp(); updateStats(); }, 500);
+            }
+        }
+
+        function animateLevelUp() {
+            const bar = document.getElementById('skillBar');
+            bar.classList.add('lvl-up-anim');
+            setTimeout(() => bar.classList.remove('lvl-up-anim'), 1000);
+        }
+
+        function useSkill() {
+            if (skillUsedThisDepth || isAnimating || !currentHero) return;
+            
+            if (currentHero.id === 'paladin') {
+                playSound('skill');
+                let heal = heroLevel === 1 ? 5 : heroLevel === 2 ? 8 : 10;
+                hp = Math.min(hpMax, hp + heal);
+                spawnLog(`+${heal} HP`, "var(--accent-green)");
+                if (heroLevel === 3) { atk += 1; setTimeout(() => spawnLog("+1 ATK", "var(--accent-blue)"), 600); }
+                skillUsedThisDepth = true; updateStats(); return;
+            }
+
+            if (cardArea.style.display === 'none' || !activeCard) {
+                spawnLog("¡Elige sala primero!", "gray"); return;
+            }
+
+            const isBoss = (activeCard.name === 'Guardián de Piedra' || activeCard.name === 'Sacerdote Carmesí' || activeCard.name === 'Mantícora Oscura' || activeCard.name === 'Señor del Abismo');
+
+            if (currentHero.id === 'caballero') {
+                if (activeCard.type !== 'monster') { spawnLog("Solo Monstruos", "gray"); return; }
+                playSound('skill'); 
+                let bonus = heroLevel === 1 ? 4 : heroLevel === 2 ? 6 : 9;
+                spawnLog(`¡+${bonus} ATK TEMPORAL!`, "var(--accent-red)");
+                knightBuff = bonus;
+                skillUsedThisDepth = true; updateStats(); 
+            } 
+            else if (currentHero.id === 'asesino') {
+                if (isBoss) { spawnLog("No puedes huir de un Jefe", "gray"); return; }
+                playSound('skill'); spawnLog("¡EVASIÓN PERFECTA!", "var(--accent-purple)");
+                skillUsedThisDepth = true; 
+                
+                if (heroLevel >= 2) { hp = Math.min(hpMax, hp + (heroLevel === 2 ? 2 : 3)); }
+                if (heroLevel === 3) { atk += 1; }
+                
+                processDodge(true); 
+            }
+            else if (currentHero.id === 'hechicero') {
+                if (activeCard.type !== 'monster' || isBoss) { spawnLog("Solo monstruos comunes", "gray"); return; }
+                playSound('skill'); spawnLog("¡TRANSMUTADO!", "var(--accent-purple)");
+                skillUsedThisDepth = true;
+                
+                let xpGain = heroLevel === 1 ? 3 : 5;
+                let hpGain = heroLevel === 1 ? 0 : heroLevel === 2 ? 2 : 5;
+                let atkGain = heroLevel === 3 ? 1 : 0;
+
+                activeCard = { 
+                    type: 'essence', name: 'Esencia Transmutada', icon: '🔮', 
+                    val: xpGain, heal: hpGain, atkBuff: atkGain,
+                    desc: 'El monstruo fue convertido en energía pura.' 
+                };
+                cardArea.innerHTML = ''; renderActiveCard(activeCard); updateStats();
+            }
+        }
+
+        function generateOptionsForCurrentRoom() {
+            let options = [];
+            options.push(getRandomScaledMonster());
+            options.push(getRandomScaledMonster());
+
+            let chanceToSpawnBeneficial = 0.75 - (currentDepth * 0.15);
+            let availableTypes = [];
+            if (!usedBeneficialThisDepth.essence) availableTypes.push('essence');
+            if (!usedBeneficialThisDepth.event) availableTypes.push('event');
+            if (!usedBeneficialThisDepth.merchant) availableTypes.push('merchant');
+
+            if (availableTypes.length > 0 && Math.random() < chanceToSpawnBeneficial) {
+                let typeToSpawn = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+                let validCards = eventPool.filter(c => c.type === typeToSpawn);
+                let card = validCards[Math.floor(Math.random() * validCards.length)];
+                options.push(card);
+                usedBeneficialThisDepth[typeToSpawn] = true;
+            } else {
+                options.push(getRandomScaledMonster());
+            }
+
+            return options.sort(() => Math.random() - 0.5);
+        }
+
+        function getRandomScaledMonster() {
+            let baseMonster = monsterPool[Math.floor(Math.random() * monsterPool.length)];
+            let scaledAtk = baseMonster.atk + (currentDepth - 1);
+            
+            let rXp = scaledAtk >= 8 ? 4 : scaledAtk >= 6 ? 3 : scaledAtk >= 4 ? 2 : 1;
+            let rHp = scaledAtk >= 8 ? 2 : scaledAtk >= 6 ? 1 : 0;
+
+            return { ...baseMonster, atk: scaledAtk, lootXp: rXp, lootHp: rHp };
+        }
+
+        function updateStats() {
+            document.getElementById('ui-hp').textContent = hp;
+            document.getElementById('ui-atk').textContent = atk + (knightBuff > 0 ? ` (+${knightBuff})` : '');
+            document.getElementById('ui-xp').textContent = xp;
+            document.getElementById('ui-progress').textContent = `PISO: ${currentDepth}/${MAX_DEPTH} - SALA: ${currentRoom}/${ROOMS_PER_DEPTH}`;
+            
+            document.getElementById('btnDodge').disabled = (hp <= 1);
+
+            const btnSkill = document.getElementById('btnSkill');
+            if (!skillUsedThisDepth) {
+                btnSkill.textContent = "USAR"; btnSkill.disabled = false; btnSkill.style.background = "var(--accent-purple)";
+            } else {
+                btnSkill.textContent = `AGOTADA`; btnSkill.disabled = true; btnSkill.style.background = "#333";
+            }
+        }
+
+        function showRoomOptions() {
+            isAnimating = false; 
+            cardArea.style.display = 'none'; controlsArea.style.display = 'none'; cardArea.innerHTML = '';
+            
+            if (currentRoom === ROOMS_PER_DEPTH) {
+                document.getElementById('roomSelection').style.display = 'none';
+                if (currentDepth === 1 || currentDepth === 3) {
+                    selectRoom(transitionCard);
+                } else if (currentDepth === 2) {
+                    const randomMidBoss = midBossPool[Math.floor(Math.random() * midBossPool.length)];
+                    selectRoom(randomMidBoss);
+                } else if (currentDepth === 4) {
+                    selectRoom(finalBossCard);
+                }
+                return;
+            }
+
+            document.getElementById('roomSelection').style.display = 'flex';
+            const container = document.getElementById('roomOptionsContainer'); container.innerHTML = '';
+            
+            const options = generateOptionsForCurrentRoom();
+
+            options.forEach((cardData) => {
+                const optEl = document.createElement('div'); optEl.className = 'room-option';
+                let colorClass = `type-${cardData.type}`; let colorHex = '', badgeHtml = '';
+
+                if (cardData.type === 'monster') { 
+                    colorHex = 'var(--accent-red)'; 
+                    let lootStr = `${cardData.lootXp}✨`;
+                    if (cardData.lootHp > 0) lootStr += ` ${cardData.lootHp}❤️`;
+                    badgeHtml = `<div class="room-stat-badge" style="color:${colorHex}">ATK: ${cardData.atk} (${lootStr})</div>`; 
+                }
+                else if (cardData.type === 'essence') { colorHex = 'var(--accent-xp)'; badgeHtml = `<div class="room-stat-badge" style="color:${colorHex}">Ganancia: +${cardData.val} XP</div>`; }
+                else if (cardData.type === 'event') { colorHex = 'var(--accent-green)'; badgeHtml = `<div class="room-stat-badge" style="color:${colorHex}">Curación</div>`; }
+                else if (cardData.type === 'merchant') { colorHex = 'var(--accent-blue)'; badgeHtml = `<div class="room-stat-badge" style="color:${colorHex}">${cardData.cost} XP ➔ +1 ATK</div>`; }
+
+                optEl.innerHTML = `
+                    <div class="room-icon">${cardData.icon}</div>
+                    <div class="room-info">
+                        <div class="room-header-inner"><div class="room-name">${cardData.name}</div><div class="room-type" style="color:${colorHex}">${typeLabels[cardData.type]}</div></div>
+                        <div class="room-desc">${cardData.desc}</div>${badgeHtml}
+                    </div>
+                `;
+
+                optEl.addEventListener('click', () => {
+                    if (isAnimating) return;
+                    isAnimating = true; 
+                    playSound('select'); optEl.style.borderColor = colorHex;
+                    
+                    setTimeout(() => {
+                        if (cardData.type === 'essence' || cardData.type === 'event' || cardData.type === 'merchant') {
+                            document.getElementById('roomSelection').style.display = 'none';
+                            autoResolveCard(cardData);
+                        } else {
+                            selectRoom(cardData);
+                        }
+                    }, 200);
+                });
+                container.appendChild(optEl);
+            });
+        }
+
+        function autoResolveCard(card) {
+            if (card.type === 'essence') {
+                playSound('xp'); spawnLog(`+${card.val} XP`, "var(--accent-xp)");
+                addXp(card.val);
+                if (card.heal) hp = Math.min(hpMax, hp + card.heal);
+                if (card.atkBuff) atk += card.atkBuff;
+            } else if (card.type === 'event') {
+                let curacion = card.val; 
+                if (curacion > 0) { hp = Math.min(hpMax, hp + curacion); playSound('heal'); spawnLog(`+${curacion} HP`, "var(--accent-green)"); }
+            } else if (card.type === 'merchant') {
+                if (xp >= card.cost) { 
+                    xp -= card.cost; atk += 1; playSound('upgrade'); spawnLog("+1 ATK", "var(--accent-blue)"); 
+                } else { 
+                    playSound('hit'); spawnLog("Falta XP", "gray"); 
+                }
+            }
+            
+            updateStats();
+            setTimeout(() => { isAnimating = false; checkGameState(); }, 800);
+        }
+
+        function selectRoom(cardData) {
+            document.getElementById('roomSelection').style.display = 'none';
+            cardArea.style.display = 'flex'; controlsArea.style.display = 'flex';
+            activeCard = cardData; renderActiveCard(cardData);
+        }
+
+        function renderActiveCard(cardData) {
+            const cardEl = document.createElement('div'); cardEl.className = 'card enter';
+            let statsHtml = '', btnActionText = '', btnColor = '';
+
+            if (cardData.type === 'monster') { 
+                let lootStr = `+${cardData.lootXp} XP`;
+                if (cardData.lootHp > 0) lootStr += ` / +${cardData.lootHp} HP`;
+                statsHtml = `<div class="c-stat" style="color:var(--accent-red)">ATK: ${cardData.atk}</div>
+                             <div class="c-stat" style="color:var(--accent-xp); font-size: 0.9rem;">${lootStr}</div>`; 
+                btnActionText = 'Luchar'; btnColor = 'var(--accent-red)'; 
+            }
+            else if (cardData.type === 'essence') { 
+                let extra = '';
+                if(cardData.heal) extra += ` / +${cardData.heal} HP`;
+                if(cardData.atkBuff) extra += ` / +${cardData.atkBuff} ATK`;
+                statsHtml = `<div class="c-stat" style="color:var(--accent-xp)">Ganancia: +${cardData.val} XP${extra}</div>`; 
+                btnActionText = 'Absorber'; btnColor = 'var(--accent-xp)'; 
+            }
+            else if (cardData.type === 'event') { 
+                if (cardData.val > 0) statsHtml = `<div class="c-stat" style="color:var(--accent-green)">Curación: +${cardData.val}</div>`; 
+                btnActionText = 'Avanzar'; btnColor = 'var(--accent-green)'; 
+            }
+            
+            cardEl.innerHTML = `
+                <div class="card-type type-${cardData.type}">${typeLabels[cardData.type]}</div>
+                <div class="card-title">${cardData.name}</div>
+                <div class="card-icon">${cardData.icon}</div>
+                <div class="card-desc">${cardData.desc}</div>
+                <div class="card-stats" style="flex-wrap: wrap; justify-content: center;">${statsHtml}</div>
+            `;
+
+            cardArea.appendChild(cardEl);
+            const btnA = document.getElementById('btnAction');
+            btnA.textContent = btnActionText; btnA.style.background = btnColor;
+
+            const isBoss = (cardData.name === 'Guardián de Piedra' || cardData.name === 'Sacerdote Carmesí' || cardData.name === 'Mantícora Oscura' || cardData.name === 'Señor del Abismo');
+            const isStairs = (cardData.name === 'Escaleras Profundas');
+            document.getElementById('btnDodge').style.display = (isStairs || isBoss) ? 'none' : 'block';
+
+            requestAnimationFrame(() => {
+                setTimeout(() => { cardEl.classList.remove('enter'); cardEl.classList.add('active'); isAnimating = false; }, 50);
+            });
+        }
+
+        function processDodge(free = false) {
+            if (isAnimating) return;
+            isAnimating = true;
+            const currentCardEl = cardArea.querySelector('.card.active');
+            
+            if (!free) { hp -= 1; playSound('hit'); spawnLog("-1 HP", "var(--accent-red)"); }
+            currentCardEl.classList.add('exit-left');
+            
+            knightBuff = 0; 
+            updateStats();
+            setTimeout(() => { currentCardEl.remove(); checkGameState(); }, 400);
+        }
+
+        function processCombat() {
+            if (isAnimating) return;
+            isAnimating = true;
+            const currentCardEl = cardArea.querySelector('.card.active');
+            currentCardEl.classList.add('exit-right');
+            
+            if (activeCard.type === 'monster') {
+                let currentAtk = atk + knightBuff; 
+                let dmg = Math.max(0, activeCard.atk - currentAtk);
+                
+                if (dmg > 0) { 
+                    hp -= dmg; playSound('hit'); spawnLog(`-${dmg} HP`, "var(--accent-red)"); 
+                } else { 
+                    playSound('safe'); spawnLog("¡Ileso!", "#fff"); 
+                }
+                
+                if (hp > 0) {
+                    setTimeout(() => { 
+                        if (activeCard.lootHp > 0) hp = Math.min(hpMax, hp + activeCard.lootHp);
+                        playSound('xp'); spawnLog(`+${activeCard.lootXp} XP`, "var(--accent-xp)");
+                        addXp(activeCard.lootXp);
+                        updateStats(); 
+                    }, 400);
+                }
+            } else if (activeCard.type === 'essence') {
+                playSound('xp'); spawnLog(`+${activeCard.val} XP`, "var(--accent-xp)");
+                addXp(activeCard.val);
+                if (activeCard.heal) hp = Math.min(hpMax, hp + activeCard.heal);
+                if (activeCard.atkBuff) atk += activeCard.atkBuff;
+            } else if (activeCard.type === 'event') {
+                let curacion = activeCard.val; 
+                if (curacion > 0) { hp = Math.min(hpMax, hp + curacion); playSound('heal'); spawnLog(`+${curacion} HP`, "var(--accent-green)"); } 
+                else { playSound('select'); spawnLog(`Descendiendo...`, "#fff"); }
+            }
+
+            knightBuff = 0; 
+            updateStats();
+            setTimeout(() => { currentCardEl.remove(); checkGameState(); }, 400);
+        }
+
+        function checkGameState() {
+            if (hp <= 0) { showEndScreen(false); return; }
+
+            currentRoom++;
+            if (currentRoom > ROOMS_PER_DEPTH) {
+                currentDepth++;
+                currentRoom = 1;
+                skillUsedThisDepth = false; 
+                usedBeneficialThisDepth = { essence: false, event: false, merchant: false }; 
+                if (currentDepth <= MAX_DEPTH) { spawnLog("NUEVO PISO", "#fff"); }
+            }
+
+            if (currentDepth > MAX_DEPTH) { showEndScreen(true); } 
+            else { updateStats(); showRoomOptions(); }
+        }
+
+        function showEndScreen(win) {
+            const overlay = document.getElementById('endOverlay');
+            const title = document.getElementById('endTitle');
+            const desc = document.getElementById('endDesc');
+            if (win) {
+                title.textContent = "¡Has Escapado!"; title.className = "win-text";
+                desc.textContent = `Venciste al Señor del Abismo.\nSobrevives con ${hp} HP y eres Nivel ${heroLevel}.`; playSound('upgrade');
+            } else {
+                title.textContent = "Has Muerto"; title.className = "lose-text";
+                desc.textContent = `La mazmorra te consumió en el Piso ${currentDepth}, Sala ${currentRoom - 1}.`;
+            }
+            overlay.style.display = 'flex';
+        }
+
+        document.getElementById('btnDodge').addEventListener('click', () => processDodge(false));
+        document.getElementById('btnAction').addEventListener('click', () => processCombat());
+        document.getElementById('btnSkill').addEventListener('click', useSkill);
+
+        showHeroSelection();
+    </script>
+</body>
+</html>
