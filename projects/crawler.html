@@ -270,26 +270,10 @@
         let usedBeneficialThisDepth = { essence: false, event: false, merchant: false };
 
         const heroesData = [
-            { 
-                id: 'caballero', name: 'Caballero Vanguardia', icon: '⚔️', hp: 12, atk: 2, 
-                skillIcon: '🗡️', skillName: 'Golpe Poderoso',
-                levels: { 1: '+4 ATK temporal.', 2: '+6 ATK temporal.', 3: '+9 ATK temporal.' }
-            },
-            { 
-                id: 'asesino', name: 'Sombra Silenciosa', icon: '🥷', hp: 9, atk: 2, 
-                skillIcon: '💨', skillName: 'Evasión Perfecta',
-                levels: { 1: 'Esquiva gratis (No Jefes).', 2: 'Esquiva gratis y recuperas 2 HP.', 3: 'Esquiva, cura 3 HP y ganas +1 ATK.' }
-            },
-            { 
-                id: 'paladin', name: 'Clérigo del Alba', icon: '🛡️', hp: 11, atk: 1, 
-                skillIcon: '✨', skillName: 'Sanación Divina',
-                levels: { 1: 'Recuperas 5 Vida.', 2: 'Recuperas 8 Vida.', 3: 'Recuperas 10 Vida y ganas +1 ATK.' }
-            },
-            { 
-                id: 'hechicero', name: 'Mago Arcano', icon: '🔮', hp: 8, atk: 3, 
-                skillIcon: '🧪', skillName: 'Transmutación',
-                levels: { 1: 'Transmuta monstruo en 3 XP.', 2: 'Transmuta en 5 XP y 2 HP.', 3: 'Transmuta en 5 XP, 5 HP y +1 ATK.' }
-            }
+            { id: 'caballero', name: 'Caballero Vanguardia', icon: '⚔️', hp: 12, atk: 2, skillIcon: '🗡️', skillName: 'Golpe Poderoso', levels: { 1: '+4 ATK temporal.', 2: '+6 ATK temporal.', 3: '+9 ATK temporal.' } },
+            { id: 'asesino', name: 'Sombra Silenciosa', icon: '🥷', hp: 9, atk: 2, skillIcon: '💨', skillName: 'Evasión Perfecta', levels: { 1: 'Esquiva gratis (No Jefes).', 2: 'Esquiva gratis y recuperas 2 HP.', 3: 'Esquiva, cura 3 HP y ganas +1 ATK.' } },
+            { id: 'paladin', name: 'Clérigo del Alba', icon: '🛡️', hp: 11, atk: 1, skillIcon: '✨', skillName: 'Sanación Divina', levels: { 1: 'Recuperas 5 Vida.', 2: 'Recuperas 8 Vida.', 3: 'Recuperas 10 Vida y ganas +1 ATK.' } },
+            { id: 'hechicero', name: 'Mago Arcano', icon: '🔮', hp: 8, atk: 3, skillIcon: '🧪', skillName: 'Transmutación', levels: { 1: 'Transmuta monstruo en 3 XP.', 2: 'Transmuta en 5 XP y 2 HP.', 3: 'Transmuta en 5 XP, 5 HP y +1 ATK.' } }
         ];
 
         const monsterPool = [
@@ -304,19 +288,15 @@
             { type: 'essence', name: 'Tomo de Sabiduría', icon: '📘', val: 3, desc: 'Conocimientos arcanos aumentan tu experiencia.' },
             { type: 'essence', name: 'Piedra de Alma', icon: '💠', val: 2, desc: 'Fragmentos de energía cristalizada.' },
             { type: 'event', name: 'Santuario Lunar', icon: '⛲', val: 3, desc: 'Aguas cristalinas que curan heridas.' },
-            { type: 'merchant', name: 'Altar de Poder', icon: '🕯️', cost: 4, desc: 'Ofrece experiencia a los dioses para fortalecerte.' }
+            { type: 'merchant', name: 'Altar de Poder', icon: '🕯️', cost: 4, desc: 'Gasta tu experiencia para fortalecer tu equipo.' }
         ];
 
         const transitionCard = { type: 'event', name: 'Escaleras Profundas', icon: '🪜', val: 0, desc: 'Las sombras se espesan mientras desciendes al siguiente nivel. No hay tiempo para descansar.' };
-        
-        // Jefes de la Planta 2
         const midBossPool = [
-            { type: 'monster', name: 'Guardián de Piedra', icon: '🗿', atk: 6, lootXp: 3, lootHp: 1, desc: 'Un coloso implacable de roca y musgo sangriento.' },
-            { type: 'monster', name: 'Sacerdote Carmesí', icon: '🩸', atk: 5, lootXp: 3, lootHp: 2, desc: 'Realiza rituales prohibidos que drenan tu esencia.' },
-            { type: 'monster', name: 'Mantícora Oscura', icon: '🦅', atk: 7, lootXp: 4, lootHp: 0, desc: 'Una bestia letal fusionada con pura pesadilla.' }
+            { type: 'monster', name: 'Guardián de Piedra', icon: '🗿', atk: 6, lootXp: 3, lootHp: 1, desc: 'Un coloso implacable.' },
+            { type: 'monster', name: 'Sacerdote Carmesí', icon: '🩸', atk: 5, lootXp: 3, lootHp: 2, desc: 'Realiza rituales prohibidos.' }
         ];
-
-        const finalBossCard = { type: 'monster', name: 'Señor del Abismo', icon: '👿', atk: 9, lootXp: 5, lootHp: 2, desc: 'Gobernante absoluto de la mazmorra. Es matar o morir.' };
+        const finalBossCard = { type: 'monster', name: 'Señor del Abismo', icon: '👿', atk: 9, lootXp: 5, lootHp: 2, desc: 'Gobernante absoluto de la mazmorra.' };
 
         const typeLabels = { 'monster': 'Monstruo', 'essence': 'Conocimiento', 'event': 'Evento', 'merchant': 'Altar' };
 
@@ -443,7 +423,7 @@
             const isBoss = (activeCard.name === 'Guardián de Piedra' || activeCard.name === 'Sacerdote Carmesí' || activeCard.name === 'Mantícora Oscura' || activeCard.name === 'Señor del Abismo');
 
             if (currentHero.id === 'caballero') {
-                if (activeCard.type !== 'monster') { spawnLog("Solo Monstruos", "gray"); return; }
+                if (activeCard.type !== 'monster') { spawnLog("Solo contra Monstruos", "gray"); return; }
                 playSound('skill'); 
                 let bonus = heroLevel === 1 ? 4 : heroLevel === 2 ? 6 : 9;
                 spawnLog(`¡+${bonus} ATK TEMPORAL!`, "var(--accent-red)");
@@ -534,14 +514,11 @@
             
             if (currentRoom === ROOMS_PER_DEPTH) {
                 document.getElementById('roomSelection').style.display = 'none';
-                if (currentDepth === 1 || currentDepth === 3) {
-                    selectRoom(transitionCard);
-                } else if (currentDepth === 2) {
-                    const randomMidBoss = midBossPool[Math.floor(Math.random() * midBossPool.length)];
-                    selectRoom(randomMidBoss);
-                } else if (currentDepth === 4) {
-                    selectRoom(finalBossCard);
-                }
+                if (currentDepth === 1 || currentDepth === 3) selectRoom(transitionCard);
+                else if (currentDepth === 2) {
+                    const boss = midBossPool[Math.floor(Math.random() * midBossPool.length)];
+                    selectRoom(boss);
+                } else if (currentDepth === 4) selectRoom(finalBossCard);
                 return;
             }
 
@@ -552,7 +529,7 @@
 
             options.forEach((cardData) => {
                 const optEl = document.createElement('div'); optEl.className = 'room-option';
-                let colorClass = `type-${cardData.type}`; let colorHex = '', badgeHtml = '';
+                let colorHex = '', badgeHtml = '';
 
                 if (cardData.type === 'monster') { 
                     colorHex = 'var(--accent-red)'; 
@@ -560,7 +537,7 @@
                     if (cardData.lootHp > 0) lootStr += ` ${cardData.lootHp}❤️`;
                     badgeHtml = `<div class="room-stat-badge" style="color:${colorHex}">ATK: ${cardData.atk} (${lootStr})</div>`; 
                 }
-                else if (cardData.type === 'essence') { colorHex = 'var(--accent-xp)'; badgeHtml = `<div class="room-stat-badge" style="color:${colorHex}">Ganancia: +${cardData.val} XP</div>`; }
+                else if (cardData.type === 'essence') { colorHex = 'var(--accent-xp)'; badgeHtml = `<div class="room-stat-badge" style="color:${colorHex}">XP: +${cardData.val}</div>`; }
                 else if (cardData.type === 'event') { colorHex = 'var(--accent-green)'; badgeHtml = `<div class="room-stat-badge" style="color:${colorHex}">Curación</div>`; }
                 else if (cardData.type === 'merchant') { colorHex = 'var(--accent-blue)'; badgeHtml = `<div class="room-stat-badge" style="color:${colorHex}">${cardData.cost} XP ➔ +1 ATK</div>`; }
 
@@ -575,16 +552,14 @@
                 optEl.addEventListener('click', () => {
                     if (isAnimating) return;
                     isAnimating = true; 
-                    playSound('select'); optEl.style.borderColor = colorHex;
+                    playSound('select');
                     
-                    setTimeout(() => {
-                        if (cardData.type === 'essence' || cardData.type === 'event' || cardData.type === 'merchant') {
-                            document.getElementById('roomSelection').style.display = 'none';
-                            autoResolveCard(cardData);
-                        } else {
-                            selectRoom(cardData);
-                        }
-                    }, 200);
+                    if (cardData.type === 'essence' || cardData.type === 'event' || cardData.type === 'merchant') {
+                        document.getElementById('roomSelection').style.display = 'none';
+                        autoResolveCard(cardData);
+                    } else {
+                        selectRoom(cardData);
+                    }
                 });
                 container.appendChild(optEl);
             });
@@ -594,8 +569,6 @@
             if (card.type === 'essence') {
                 playSound('xp'); spawnLog(`+${card.val} XP`, "var(--accent-xp)");
                 addXp(card.val);
-                if (card.heal) hp = Math.min(hpMax, hp + card.heal);
-                if (card.atkBuff) atk += card.atkBuff;
             } else if (card.type === 'event') {
                 let curacion = card.val; 
                 if (curacion > 0) { hp = Math.min(hpMax, hp + curacion); playSound('heal'); spawnLog(`+${curacion} HP`, "var(--accent-green)"); }
@@ -629,17 +602,15 @@
                 btnActionText = 'Luchar'; btnColor = 'var(--accent-red)'; 
             }
             else if (cardData.type === 'essence') { 
-                let extra = '';
-                if(cardData.heal) extra += ` / +${cardData.heal} HP`;
-                if(cardData.atkBuff) extra += ` / +${cardData.atkBuff} ATK`;
-                statsHtml = `<div class="c-stat" style="color:var(--accent-xp)">Ganancia: +${cardData.val} XP${extra}</div>`; 
+                statsHtml = `<div class="c-stat" style="color:var(--accent-xp)">Ganancia: +${cardData.val} XP</div>`; 
                 btnActionText = 'Absorber'; btnColor = 'var(--accent-xp)'; 
             }
             else if (cardData.type === 'event') { 
                 if (cardData.val > 0) statsHtml = `<div class="c-stat" style="color:var(--accent-green)">Curación: +${cardData.val}</div>`; 
                 btnActionText = 'Avanzar'; btnColor = 'var(--accent-green)'; 
             }
-            
+            else if (cardData.type === 'merchant') { statsHtml = `<div class="c-stat" style="color:var(--accent-gold)">Coste: -${cardData.cost} XP</div><div class="c-stat" style="color:var(--accent-blue)">ATK: +1</div>`; btnActionText = 'Gasta tu experiencia'; btnColor = 'var(--accent-blue)'; }
+
             cardEl.innerHTML = `
                 <div class="card-type type-${cardData.type}">${typeLabels[cardData.type]}</div>
                 <div class="card-title">${cardData.name}</div>
@@ -701,12 +672,17 @@
             } else if (activeCard.type === 'essence') {
                 playSound('xp'); spawnLog(`+${activeCard.val} XP`, "var(--accent-xp)");
                 addXp(activeCard.val);
-                if (activeCard.heal) hp = Math.min(hpMax, hp + activeCard.heal);
-                if (activeCard.atkBuff) atk += activeCard.atkBuff;
             } else if (activeCard.type === 'event') {
                 let curacion = activeCard.val; 
                 if (curacion > 0) { hp = Math.min(hpMax, hp + curacion); playSound('heal'); spawnLog(`+${curacion} HP`, "var(--accent-green)"); } 
                 else { playSound('select'); spawnLog(`Descendiendo...`, "#fff"); }
+            } else if (activeCard.type === 'merchant') {
+                if (xp >= activeCard.cost) { 
+                    xp -= activeCard.cost; atk += 1; playSound('upgrade'); spawnLog("+1 ATK", "var(--accent-blue)"); 
+                } else { 
+                    playSound('hit'); spawnLog("Falta XP", "gray"); 
+                    currentCardEl.classList.remove('exit-right'); currentCardEl.classList.add('exit-left');
+                }
             }
 
             knightBuff = 0; 
@@ -723,7 +699,7 @@
                 currentRoom = 1;
                 skillUsedThisDepth = false; 
                 usedBeneficialThisDepth = { essence: false, event: false, merchant: false }; 
-                if (currentDepth <= MAX_DEPTH) { spawnLog("NUEVO PISO", "#fff"); }
+                if (currentDepth <= MAX_DEPTH) { spawnLog("PISO DESCENDIDO", "#fff"); }
             }
 
             if (currentDepth > MAX_DEPTH) { showEndScreen(true); } 
@@ -736,10 +712,10 @@
             const desc = document.getElementById('endDesc');
             if (win) {
                 title.textContent = "¡Has Escapado!"; title.className = "win-text";
-                desc.textContent = `Venciste al Señor del Abismo.\nSobrevives con ${hp} HP y eres Nivel ${heroLevel}.`; playSound('upgrade');
+                desc.textContent = `Venciste al Señor del Abismo en el Piso 4.\nSobrevives con ${hp} HP y eres Nivel ${heroLevel}.`; playSound('upgrade');
             } else {
                 title.textContent = "Has Muerto"; title.className = "lose-text";
-                desc.textContent = `La mazmorra te consumió en el Piso ${currentDepth}, Sala ${currentRoom - 1}.`;
+                desc.textContent = `La mazmorra te ha consumido en el Piso ${currentDepth}, Sala ${currentRoom - 1}.`;
             }
             overlay.style.display = 'flex';
         }
