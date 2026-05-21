@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Los Cuadraditos - Mobile</title>
+    <style>
+        :root {
+            --bg-color: #121214;
+            --panel-color: #1e1e24;
+            --dot-color: #ffffff;
+            --line-ghost: #2f3542;
+            --p1-color: #ff4757;
+            --p2-color: #ffa502;
+            --text-color: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 100vh;
+            height: 100dvh;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        header {
+            text-align: center;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+
+        /* Marcador de puntuación y turnos */
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            background: var(--panel-color);
+            padding: 10px 24px;
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 0 auto;
+        }
+
+        .score-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            transition: transform 0.3s, background-color 0.3s;
+        }
+
+        .score-box.active {
+            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.1);
+        }
+
+        .dot-indicator {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+        }
+        .dot-indicator.p1 { background: var(--p1-color); box-shadow: 0 0 8px var(--p1-color); }
+        .dot-indicator.p2 { background: var(--p2-color); box-shadow: 0 0 8px var(--p2-color); }
+
+        /* Contenedor del área de juego */
+        .board-container {
+            width: 100%;
+            max-width: 380px;
+            aspect-ratio: 1;
+            position: relative;
+            background-color: var(--panel-color);
+            border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+            padding: 20px;
+        }
+
+        #game-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        /* Estilos de los elementos del juego */
+        .grid-dot {
+            fill: var(--dot-color);
+            transition: fill 0.3s;
+        }
+
+        /* Líneas invisibles pero anchas para facilitar el toque táctil */
+        .click-zone {
+            stroke: transparent;
+            stroke-linecap: round;
+            cursor: pointer;
+        }
+
+        /* La línea visual que ve el jugador */
+        .visual-line {
+            stroke: var(--line-ghost);
+            stroke-linecap: round;
+            transition: stroke 0.2s, stroke-width 0.2s;
+            pointer-events: none; /* No interfiere con el toque */
+        }
+
+        /* Animación y feedback visual al pulsar o pasar por encima */
+        .click-zone:active ~ .visual-line,
+        .click-zone:hover ~ .visual-line {
+            stroke: rgba(255,255,255,0.3);
+        }
+
+        /* Líneas definitivas de los jugadores */
+        .visual-line.taken-p1 { stroke: var(--p1-color); filter: drop-shadow(0px 0px 4px var(--p1-color)); }
+        .visual-line.taken-p2 { stroke: var(--p2-color); filter: drop-shadow(0px 0px 4px var(--p2-color)); }
+
+        /* Cuadrados conquistados */
+        .box-fill {
+            opacity: 0;
+            transform: scale(0);
+            transform-origin: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .box-fill.taken-p1 { fill: var(--p1-color); opacity: 0.15; transform: scale(1); }
+        .box-fill.taken-p2 { fill: var(--p2-color); opacity: 0.15; transform: scale(1); }
+
+        footer {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding-bottom: 10px;
+        }
+
+        .reset-btn {
+            background-color: #2f3542;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: background-color 0.2s, transform 0.1s;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .reset-btn:active {
+            transform: scale(0.95);
+            background-color: #57606f;
+        }
+
+        /* Pantalla de Fin de Juego */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 10;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .overlay-text {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>LOS CUADRADITOS</h1>
+        <div class="scoreboard">
+            <div class="score-box active" id="scoreP1">
+                <div class="dot-indicator p1"></div>
+                <span>P1: <span id="ptsP1">0</span></span>
+            </div>
+            <div class="score-box" id="scoreP2">
+                <div class="dot-indicator p2"></div>
+                <span>P2: <span id="ptsP2">0</span></span>
+            </div>
+        </div>
+    </header>
+
+    <div class="board-container">
+        <svg id="game-svg" viewBox="0 0 400 400"></svg>
+    </div>
+
+    <footer>
+        <button class="reset-btn" id="resetBtn">Reiniciar Partida</button>
+    </footer>
+
+    <div class="overlay" id="overlay">
+        <div class="overlay-text" id="overlayText">¡Jugador 1 Gana!</div>
+        <button class="reset-btn" id="overlayResetBtn">Jugar de nuevo</button>
+    </div>
+
+    <script>
+        const GRID_SIZE = 5; // 5x5 puntos = 4x4 cuadrados (16 en total)
+        const SPACING = 80;  // Distancia en píxeles SVG entre puntos
+        const OFFSET = 40;   // Margen para que no se corten los bordes
+
+        let currentPlayer = 1;
+        let scores = { 1: 0, 2: 0 };
+        let linesState = {}; // Guarda qué líneas han sido pulsadas
+        let boxesState = []; // Guarda el estado de los 16 cuadrados
+
+        const svg = document.getElementById('game-svg');
+        const overlay = document.getElementById('overlay');
+        const overlayText = document.getElementById('overlayText');
+        const resetBtn = document.getElementById('resetBtn');
+        const overlayResetBtn = document.getElementById('overlayResetBtn');
+
+        // Audio Sintetizado Móvil
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+
+            if (type === 'line') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+            } else if (type === 'box') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // Nota Do
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // Nota Mi
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+            } else if (type === 'win') {
+                osc.type = 'sine';
+                const notes = [440, 554, 659, 880];
+                notes.forEach((f, i) => osc.frequency.setValueAtTime(f, audioCtx.currentTime + i * 0.1));
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+            }
+        }
+
+        function initGame() {
+            svg.innerHTML = '';
+            currentPlayer = 1;
+            scores = { 1: 0, 2: 0 };
+            linesState = {};
+            boxesState = [];
+            overlay.style.display = 'none';
+            updateUI();
+
+            // 1. Crear lógicamente y dibujar los contenedores de los cuadrados (capa de fondo)
+            for (let r = 0; r < GRID_SIZE - 1; r++) {
+                for (let c = 0; c < GRID_SIZE - 1; c++) {
+                    const boxId = `box-${r}-${c}`;
+                    boxesState.push({
+                        id: boxId, row: r, col: c, filled: false,
+                        lines: [
+                            `h-${r}-${c}`,     // Línea superior
+                            `h-${r+1}-${c}`,   // Línea inferior
+                            `v-${r}-${c}`,     // Línea izquierda
+                            `v-${r}-${c+1}`    // Línea derecha
+                        ]
+                    });
+
+                    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                    rect.setAttribute("id", boxId);
+                    rect.setAttribute("x", c * SPACING + OFFSET);
+                    rect.setAttribute("y", r * SPACING + OFFSET);
+                    rect.setAttribute("width", SPACING);
+                    rect.setAttribute("height", SPACING);
+                    rect.setAttribute("class", "box-fill");
+                    svg.appendChild(rect);
+                }
+            }
+
+            // 2. Generar interactividad de líneas (Líneas horizontales y verticales)
+            // Horizontales
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE - 1; c++) {
+                    createLine(`h-${r}-${c}`, c * SPACING + OFFSET, r * SPACING + OFFSET, (c + 1) * SPACING + OFFSET, r * SPACING + OFFSET);
+                }
+            }
+            // Verticales
+            for (let r = 0; r < GRID_SIZE - 1; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    createLine(`v-${r}-${c}`, c * SPACING + OFFSET, r * SPACING + OFFSET, c * SPACING + OFFSET, (r + 1) * SPACING + OFFSET);
+                }
+            }
+
+            // 3. Dibujar los puntos del mapa (Capa superior visual)
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                    circle.setAttribute("cx", c * SPACING + OFFSET);
+                    circle.setAttribute("cy", r * SPACING + OFFSET);
+                    circle.setAttribute("r", "6");
+                    circle.setAttribute("class", "grid-dot");
+                    svg.appendChild(circle);
+                }
+            }
+        }
+
+        function createLine(id, x1, y1, x2, y2) {
+            linesState[id] = 0; // 0 = libre
+
+            // Grupo contenedor para estructurar capas (Zona de click + Línea visual)
+            const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+
+            // Línea visual fina trasera
+            const vLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            vLine.setAttribute("x1", x1); vLine.setAttribute("y1", y1);
+            vLine.setAttribute("x2", x2); vLine.setAttribute("y2", y2);
+            vLine.setAttribute("stroke-width", "4");
+            vLine.setAttribute("class", "visual-line");
+            vLine.setAttribute("id", `visual-${id}`);
+
+            // Zona invisible ultra-ancha delantera optimizada para el dedo
+            const cZone = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            cZone.setAttribute("x1", x1); cZone.setAttribute("y1", y1);
+            cZone.setAttribute("x2", x2); cZone.setAttribute("y2", y2);
+            cZone.setAttribute("stroke-width", "24"); // Área táctil generosa
+            cZone.setAttribute("class", "click-zone");
+
+            // Captura de pulsación inmediata en smartphones sin lag
+            cZone.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                handleLineClick(id);
+            });
+
+            g.appendChild(cZone);
+            g.appendChild(vLine);
+            svg.appendChild(g);
+        }
+
+        function handleLineClick(id) {
+            if (linesState[id] !== 0) return; // Línea ya ocupada
+
+            linesState[id] = currentPlayer;
+            
+            // Pintar la línea visual del color del jugador actual
+            const vLine = document.getElementById(`visual-${id}`);
+            vLine.classList.add(`taken-p1`, `taken-p${currentPlayer}`);
+
+            let boxClosedThisTurn = false;
+            playSound('line');
+
+            // Verificar si este movimiento cierra uno o más cuadrados
+            boxesState.forEach(box => {
+                if (!box.filled) {
+                    // Si todas las líneas que componen este cuadrado están marcadas (!= 0)
+                    const allLinesTaken = box.lines.every(lineId => linesState[lineId] !== 0);
+                    if (allLinesTaken) {
+                        box.filled = true;
+                        boxClosedThisTurn = true;
+                        scores[currentPlayer]++;
+                        
+                        // Iluminar el cuadrado con el color del dueño
+                        const rect = document.getElementById(box.id);
+                        rect.classList.add(`taken-p${currentPlayer}`);
+                    }
+                }
+            });
+
+            if (boxClosedThisTurn) {
+                playSound('box');
+                // Si completas cuadrado, sigues jugando (No se cambia el turno)
+                updateUI();
+                checkGameOver();
+            } else {
+                // Si no completas cuadrado, pasa el turno al rival
+                currentPlayer = currentPlayer === 1 ? 2 : 1;
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('ptsP1').textContent = scores[1];
+            document.getElementById('ptsP2').textContent = scores[2];
+
+            document.getElementById('scoreP1').classList.toggle('active', currentPlayer === 1);
+            document.getElementById('scoreP2').classList.toggle('active', currentPlayer === 2);
+        }
+
+        function checkGameOver() {
+            // El juego termina cuando se completan los 16 cuadrados (4x4)
+            const allFilled = boxesState.every(box => box.filled);
+            if (allFilled) {
+                let msg = "";
+                if (scores[1] > scores[2]) msg = "¡Jugador 1 Gana!";
+                else if (scores[2] > scores[1]) msg = "¡Jugador 2 Gana!";
+                else msg = "¡Empate absoluto!";
+
+                playSound('win');
+                setTimeout(() => {
+                    overlayText.textContent = msg;
+                    overlay.style.display = 'flex';
+                }, 500);
+            }
+        }
+
+        resetBtn.addEventListener('click', initGame);
+        overlayResetBtn.addEventListener('click', initGame);
+
+        // Iniciar al cargar el archivo
+        initGame();
+    </script>
+</body>
+</html>
