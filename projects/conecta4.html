@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Conecta 4 - Mobile</title>
+    <style>
+        :root {
+            --bg-color: #121214;
+            --board-color: #1e1e24;
+            --slot-color: #121214;
+            --p1-color: #ff4757;
+            --p2-color: #ffa502;
+            --text-color: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 100vh;
+            height: 100dvh;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        header {
+            text-align: center;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+
+        .turn-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            background: #1e1e24;
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-flex;
+            margin: 0 auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .player-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        .player-dot.p1 { background-color: var(--p1-color); box-shadow: 0 0 10px var(--p1-color); }
+        .player-dot.p2 { background-color: var(--p2-color); box-shadow: 0 0 10px var(--p2-color); }
+
+        .game-container {
+            width: 100%;
+            max-width: 450px;
+            aspect-ratio: 7 / 6;
+            background-color: var(--board-color);
+            border-radius: 16px;
+            padding: 12px;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .column-btn {
+            display: grid;
+            grid-template-rows: repeat(6, 1fr);
+            gap: 8px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .slot {
+            background-color: var(--slot-color);
+            border-radius: 50%;
+            aspect-ratio: 1;
+            position: relative;
+            /* Permite ver la ficha cuando entra por arriba del slot */
+            overflow: visible; 
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.6);
+        }
+
+        /* Máscara para que la ficha parezca que encaja por detrás del panel */
+        .slot::after {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px; right: -1px; bottom: -1px;
+            border: 2px solid var(--board-color);
+            border-radius: 50%;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .piece {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            will-change: transform;
+            /* Forzamos que empiece la animación desde fuera de la pantalla (-100 vh/vmax) */
+            animation: dropFromTop 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+
+        .piece.p1 {
+            background: radial-gradient(circle at 30% 30%, #ff6b81, var(--p1-color));
+            box-shadow: inset 0 -4px 6px rgba(0,0,0,0.4), 0 4px 10px rgba(255, 71, 87, 0.3);
+        }
+
+        .piece.p2 {
+            background: radial-gradient(circle at 30% 30%, #ffbe76, var(--p2-color));
+            box-shadow: inset 0 -4px 6px rgba(0,0,0,0.4), 0 4px 10px rgba(255, 165, 2, 0.3);
+        }
+
+        .piece.winner-piece {
+            animation: pulse 0.8s infinite alternate;
+            border: 3px solid #fff;
+            z-index: 4;
+        }
+
+        /* Animación corregida: Viene desde el extremo superior físico de la pantalla y rebota */
+        @keyframes dropFromTop {
+            0% {
+                transform: translateY(-100vmax);
+            }
+            80% {
+                transform: translateY(0);
+            }
+            90% {
+                transform: translateY(-12px); /* Pequeño rebote */
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); filter: brightness(1); }
+            100% { transform: scale(0.93); filter: brightness(1.3); }
+        }
+
+        footer {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding-bottom: 10px;
+        }
+
+        .reset-btn {
+            background-color: #2f3542;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: background-color 0.2s, transform 0.1s;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .reset-btn:active {
+            transform: scale(0.95);
+            background-color: #57606f;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 10;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .overlay-text {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>CONECTA 4</h1>
+        <div class="turn-indicator" id="turnIndicator">
+            <div class="player-dot p1" id="turnDot"></div>
+            <span id="turnText">Turno de Jugador 1</span>
+        </div>
+    </header>
+
+    <div class="game-container" id="board"></div>
+
+    <footer>
+        <button class="reset-btn" id="resetBtn">Reiniciar Partida</button>
+    </footer>
+
+    <div class="overlay" id="overlay">
+        <div class="overlay-text" id="overlayText">¡Jugador 1 Gana!</div>
+        <button class="reset-btn" id="overlayResetBtn">Jugar de nuevo</button>
+    </div>
+
+    <script>
+        const ROWS = 6;
+        const COLS = 7;
+        let boardState = [];
+        let currentPlayer = 1; 
+        let gameActive = true;
+        let isAnimating = false; // Bloqueo para evitar toques durante la animación de caída
+
+        const boardEl = document.getElementById('board');
+        const turnDot = document.getElementById('turnDot');
+        const turnText = document.getElementById('turnText');
+        const resetBtn = document.getElementById('resetBtn');
+        const overlay = document.getElementById('overlay');
+        const overlayText = document.getElementById('overlayText');
+        const overlayResetBtn = document.getElementById('overlayResetBtn');
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'drop') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(280, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.35);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.35);
+            } else if (type === 'win') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(554, audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+            }
+        }
+
+        function initGame() {
+            boardState = Array(COLS).fill(null).map(() => Array(ROWS).fill(0));
+            currentPlayer = 1;
+            gameActive = true;
+            isAnimating = false;
+            boardEl.innerHTML = '';
+            overlay.style.display = 'none';
+            updateUI();
+
+            for (let c = 0; c < COLS; c++) {
+                const colBtn = document.createElement('div');
+                colBtn.className = 'column-btn';
+                colBtn.dataset.col = c;
+                
+                colBtn.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    makeMove(c);
+                });
+
+                for (let r = 0; r < ROWS; r++) {
+                    const slot = document.createElement('div');
+                    slot.className = 'slot';
+                    slot.id = `slot-${c}-${r}`;
+                    colBtn.appendChild(slot);
+                }
+                boardEl.appendChild(colBtn);
+            }
+        }
+
+        function makeMove(col) {
+            if (!gameActive || isAnimating) return;
+
+            let row = -1;
+            for (let r = ROWS - 1; r >= 0; r--) {
+                if (boardState[col][r] === 0) {
+                    row = r;
+                    break;
+                }
+            }
+
+            if (row === -1) return; 
+
+            isAnimating = true; 
+            boardState[col][row] = currentPlayer;
+            playSound('drop');
+
+            // Insertamos la pieza directamente dentro de su slot correspondiente
+            const slot = document.getElementById(`slot-${col}-${row}`);
+            const piece = document.createElement('div');
+            piece.className = `piece p${currentPlayer}`;
+            slot.appendChild(piece);
+
+            // Esperamos los 500ms que tarda en caer y rebotar desde arriba
+            setTimeout(() => {
+                isAnimating = false;
+
+                const winningPieces = checkWin(col, row);
+                if (winningPieces) {
+                    gameActive = false;
+                    playSound('win');
+                    highlightWinningPieces(winningPieces);
+                    setTimeout(() => showEndGame(`¡Jugador ${currentPlayer} Gana!`), 500);
+                    return;
+                }
+
+                if (boardState.every(c => c.every(r => r !== 0))) {
+                    gameActive = false;
+                    setTimeout(() => showEndGame('¡Empate!'), 400);
+                    return;
+                }
+
+                currentPlayer = currentPlayer === 1 ? 2 : 1;
+                updateUI();
+            }, 500);
+        }
+
+        function updateUI() {
+            turnDot.className = `player-dot p${currentPlayer}`;
+            turnText.textContent = `Turno de Jugador ${currentPlayer}`;
+        }
+
+        function checkWin(c, r) {
+            const p = boardState[c][r];
+            const directions = [
+                { dc: 1, dr: 0 },  
+                { dc: 0, dr: 1 },  
+                { dc: 1, dr: 1 },  
+                { dc: 1, dr: -1 }  
+            ];
+
+            for (const { dc, dr } of directions) {
+                let matches = [{ c, r }];
+
+                let i = 1;
+                while (true) {
+                    const nc = c + dc * i;
+                    const nr = r + dr * i;
+                    if (nc >= 0 && nc < COLS && nr >= 0 && nr < ROWS && boardState[nc][nr] === p) {
+                        matches.push({ c: nc, r: nr });
+                        i++;
+                    } else break;
+                }
+
+                i = 1;
+                while (true) {
+                    const nc = c - dc * i;
+                    const nr = r - dr * i;
+                    if (nc >= 0 && nc < COLS && nr >= 0 && nr < ROWS && boardState[nc][nr] === p) {
+                        matches.push({ c: nc, r: nr });
+                        i++;
+                    } else break;
+                }
+
+                if (matches.length >= 4) return matches;
+            }
+            return null;
+        }
+
+        function highlightWinningPieces(pieces) {
+            pieces.forEach(({ c, r }) => {
+                const slot = document.getElementById(`slot-${c}-${r}`);
+                const piece = slot.querySelector('.piece');
+                if (piece) piece.classList.add('winner-piece');
+            });
+        }
+
+        function showEndGame(message) {
+            overlayText.textContent = message;
+            overlay.style.display = 'flex';
+        }
+
+        resetBtn.addEventListener('click', initGame);
+        overlayResetBtn.addEventListener('click', initGame);
+
+        initGame();
+    </script>
+</body>
+</html>
